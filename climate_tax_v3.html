@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Climate Tax of AI — Interactive Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#f7f5f0; --white:#fff; --text:#18181b; --text-2:#52525b; --text-3:#a1a1aa;
+  --border:#e4e0d8; --navy:#1b3a6b; --substack:#ff6719;
+  --c-green:#0a7c52; --c-green-bg:#ecfdf5;
+  --c-gray:#52525b;  --c-gray-bg:#f4f4f5;
+  --c-amber:#b45309; --c-amber-bg:#fef3c7;
+  --c-red:#b91c1c;   --c-red-bg:#fee2e2;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --font-sans:'Source Sans 3',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.65}
+
+/* NAV */
+nav{background:var(--navy);position:sticky;top:0;z-index:500;height:56px;display:flex;align-items:center;padding:0 36px;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.nav-brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.nav-sub{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.nav-title{font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff}
+.nav-sections{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.nav-sec{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-decoration:none;transition:all .15s;border:1px solid transparent}
+.nav-sec:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-sec.active{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.12)}
+.nav-cta{background:var(--substack);color:#fff;text-decoration:none;padding:6px 16px;border-radius:3px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;transition:opacity .15s;flex-shrink:0}
+.nav-cta:hover{opacity:.88}
+.nav-divider{width:1px;height:28px;background:rgba(255,255,255,.15);margin:0 12px}
+
+/* LAYOUT */
+.wrap{max-width:1080px;margin:0 auto;padding:0 36px}
+
+/* HERO */
+.hero{background:var(--navy);padding:56px 0 48px}
+.hero-inner{display:flex;align-items:flex-start;gap:64px}
+.hero-text{flex:1}
+.hero-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px}
+.hero h1{font-family:var(--font-serif);font-size:clamp(38px,5vw,60px);line-height:1.06;color:#fff;margin-bottom:14px}
+.hero h1 em{color:rgba(255,255,255,.6);font-style:italic}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.6);max-width:460px;line-height:1.75;margin-bottom:24px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);text-decoration:none;padding:11px 22px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-radius:3px;transition:opacity .15s}
+.hero-cta:hover{opacity:.88}
+.hero-questions{flex:0 0 360px;border-left:1px solid rgba(255,255,255,.15);padding-left:36px}
+.hq-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px}
+.hq-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.hq-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.hq-item:last-child{border-bottom:none}
+.hq-num{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(255,255,255,.3);min-width:18px;margin-top:2px}
+.hq-text{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5}
+.hq-text a{color:rgba(255,255,255,.7);text-decoration:none}
+.hq-text a:hover{color:#fff}
+
+/* SECTIONS */
+.section{padding:68px 0 60px;border-bottom:1px solid var(--border);position:relative}
+.section:last-child{border-bottom:none}
+.sec-num{position:absolute;top:44px;right:-8px;font-family:var(--font-serif);font-size:160px;font-weight:900;color:rgba(27,58,107,.04);line-height:1;pointer-events:none;user-select:none}
+.sec-eye{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sec-eye::before{content:'';display:block;width:20px;height:1.5px;background:var(--text-3)}
+.sec-eye span{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+h2{font-family:var(--font-serif);font-size:clamp(22px,2.8vw,32px);color:var(--text);margin-bottom:12px;line-height:1.2}
+.sec-lead{font-size:15px;color:var(--text-2);max-width:700px;line-height:1.8;margin-bottom:36px}
+
+/* SECTION 1 — PUE EXPLAINER */
+.pue-formula{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px}
+.pue-box{padding:26px 22px;text-align:center}
+.pue-box-lbl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.pue-box-n{font-family:var(--font-serif);font-size:30px;font-weight:700}
+.pue-box-sub{font-size:11.5px;color:var(--text-2);margin-top:6px;line-height:1.5}
+.pue-op{font-family:var(--font-serif);font-size:36px;color:var(--text-3);display:flex;align-items:center;padding:0 8px;background:var(--bg)}
+.pue-result{background:var(--navy);color:#fff}
+.pue-result .pue-box-lbl{color:rgba(255,255,255,.45)}
+.pue-result .pue-box-n{color:#fff}
+.pue-result .pue-box-sub{color:rgba(255,255,255,.6)}
+
+.pue-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.chain-step{background:var(--white);border:1px solid var(--border);border-radius:5px;padding:18px 16px;position:relative}
+.chain-step::after{content:'→';position:absolute;right:-18px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-3);z-index:1}
+.chain-step:last-child::after{display:none}
+.chain-n{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.chain-txt{font-size:12px;color:var(--text-2);line-height:1.55}
+
+.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:36px}
+.tier-c{border-radius:5px;padding:14px 16px;border-left:3px solid}
+.tier-c.g{background:var(--c-green-bg);border-color:var(--c-green)} .tier-c.g .tier-c-n{color:var(--c-green)}
+.tier-c.gr{background:var(--c-gray-bg);border-color:var(--c-gray)}  .tier-c.gr .tier-c-n{color:var(--c-gray)}
+.tier-c.a{background:var(--c-amber-bg);border-color:var(--c-amber)} .tier-c.a .tier-c-n{color:var(--c-amber)}
+.tier-c.r{background:var(--c-red-bg);border-color:var(--c-red)}    .tier-c.r .tier-c-n{color:var(--c-red)}
+.tier-c-lbl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+.tier-c-n{font-family:var(--font-mono);font-size:18px;font-weight:700}
+.tier-c-txt{font-size:12px;color:var(--text-2);margin-top:5px;line-height:1.5}
+
+/* GOOGLE PUE PARAGRAPH */
+.analysis-block{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:28px 32px;margin-bottom:28px}
+.analysis-block p{font-size:14.5px;color:var(--text-2);line-height:1.85}
+.analysis-block strong{color:var(--text)}
+
+/* POLICY ASKS */
+.policy-title{font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:18px}
+.policy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.policy-card{background:var(--white);border:1px solid var(--border);border-radius:5px;padding:22px 20px;border-top:3px solid var(--navy)}
+.policy-n{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+.policy-head{font-family:var(--font-serif);font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.policy-txt{font-size:13px;color:var(--text-2);line-height:1.65}
+
+/* CHART CARD */
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:28px 30px;margin-bottom:20px}
+.chart-title{font-family:var(--font-serif);font-size:18px;color:var(--text)}
+.chart-sub{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;color:var(--text-3);margin-top:3px;margin-bottom:20px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:18px}
+.leg-item{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;color:var(--text-2)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-diamond{width:10px;height:10px;background:#888;transform:rotate(45deg);flex-shrink:0}
+.leg-line{width:20px;height:0;border-top:2px dashed;flex-shrink:0}
+.scroll-chart-wrap{overflow-y:auto;border:1px solid var(--border);border-radius:4px}
+.scroll-chart-wrap::-webkit-scrollbar{width:5px}
+.scroll-chart-wrap::-webkit-scrollbar-track{background:transparent}
+.scroll-chart-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* MAP */
+.map-wrap{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px}
+.map-header{background:var(--white);padding:16px 24px;border-bottom:1px solid var(--border)}
+.map-header h3{font-family:var(--font-serif);font-size:17px;color:var(--text)}
+.map-header p{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;color:var(--text-3);margin-top:3px}
+.map-container{height:420px}
+.map-legend-bar{background:var(--white);padding:11px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ml-lbl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3)}
+.ml-item{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-2)}
+.ml-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+/* REGRESSION SECTION */
+.reg-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.reg-card{background:var(--navy);border-radius:6px;padding:26px 28px;color:#fff}
+.reg-badge{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px}
+.reg-title{font-family:var(--font-serif);font-size:16px;color:#fff;margin-bottom:14px}
+.reg-eq{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.08);padding:12px 14px;border-radius:4px;color:rgba(255,255,255,.9);line-height:1.9;margin-bottom:12px}
+.reg-stats{display:flex;gap:20px}
+.reg-sv{font-family:var(--font-mono);font-size:14px;font-weight:600;color:#fff;display:block}
+.reg-sl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:2px;display:block}
+.r2-block{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px 28px;margin-bottom:20px}
+.r2-bar-wrap{background:var(--bg);border-radius:4px;height:26px;overflow:hidden;position:relative;margin:12px 0 8px}
+.r2-climate{height:100%;background:var(--navy);display:flex;align-items:center;padding-right:10px;justify-content:flex-end}
+.r2-ops{position:absolute;right:0;top:0;height:100%;width:75%;background:var(--border);display:flex;align-items:center;padding-left:10px}
+.r2-lbl{font-family:var(--font-mono);font-size:10px;font-weight:600}
+
+/* MODEL TABLE */
+.model-tbl-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.model-tbl-wrap th{font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);text-align:center;padding:8px 10px;border-bottom:2px solid var(--border);border-right:1px solid var(--border)}
+.model-tbl-wrap th:first-child{text-align:left}
+.model-tbl-wrap th:last-child{border-right:none}
+.model-tbl-wrap td{padding:9px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;vertical-align:top;line-height:1.4}
+.model-tbl-wrap td:first-child{text-align:left;font-weight:700}
+.model-tbl-wrap td:last-child{border-right:none;font-size:11.5px;color:var(--text-2);text-align:left}
+.model-tbl-wrap tr:last-child td{border-bottom:none}
+.model-tbl-wrap tr.sel-row td{background:#eff6ff}
+.model-section-hdr td{background:var(--navy)!important;color:#fff!important;font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:left!important;padding:8px 12px;border:none!important}
+.sel-badge{display:inline-block;background:var(--navy);color:#fff;font-family:var(--font-mono);font-size:8px;padding:2px 6px;border-radius:2px;letter-spacing:.08em;margin-left:4px}
+.sel-row .sel-badge{background:var(--c-green);color:#fff}
+
+/* SCATTER PLOT LAYOUT */
+.scatter-wrap{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.scatter-chart-panel{flex:1;padding:20px;min-width:0}
+.scatter-index-panel{width:340px;flex-shrink:0;border-left:1px solid var(--border);overflow-y:auto;max-height:500px;background:#fafafa}
+.scatter-index-panel::-webkit-scrollbar{width:4px}
+.scatter-index-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.si-header{position:sticky;top:0;background:var(--navy);display:grid;grid-template-columns:32px 1fr 52px 52px 44px;gap:0;padding:8px 10px;z-index:2}
+.si-hcell{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);text-align:center}
+.si-hcell:nth-child(2){text-align:left}
+.si-row{display:grid;grid-template-columns:32px 1fr 52px 52px 44px;gap:0;padding:6px 10px;border-bottom:1px solid var(--border);align-items:center}
+.si-row:last-child{border-bottom:none}
+.si-row:nth-child(even){background:rgba(0,0,0,.015)}
+.si-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.si-name{font-size:11px;color:var(--text);line-height:1.3;padding-left:4px}
+.si-val{font-family:var(--font-mono);font-size:11px;color:var(--text-2);text-align:center}
+.si-diff{font-family:var(--font-mono);font-size:11px;font-weight:700;text-align:center}
+.si-diff.pos{color:#2563a8}
+.si-diff.neg{color:#c0392b}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:13px}
+table.dt th{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);text-align:left;padding:9px 12px;border-bottom:2px solid var(--border);white-space:nowrap}
+table.dt th.r{text-align:right}
+table.dt td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.dt td.r{text-align:right;font-family:var(--font-mono);font-size:12px}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:var(--bg)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+.pill-sm{display:inline-block;padding:2px 8px;border-radius:3px;font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase}
+.pill-g{background:var(--c-green-bg);color:var(--c-green)}
+.pill-gr{background:var(--c-gray-bg);color:var(--c-gray)}
+.pill-a{background:var(--c-amber-bg);color:var(--c-amber)}
+.pill-r{background:var(--c-red-bg);color:var(--c-red)}
+.vpos{color:var(--c-green);font-family:var(--font-mono);font-size:12px;font-weight:600}
+.vneg{color:var(--c-red);font-family:var(--font-mono);font-size:12px;font-weight:600}
+.footnote{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:12px;line-height:1.7}
+
+/* LEAFLET */
+.leaflet-popup-content-wrapper{border-radius:5px!important;border:1px solid var(--border)!important;box-shadow:0 4px 20px rgba(0,0,0,.12)!important;padding:0!important}
+.leaflet-popup-content{margin:0!important}
+.popup-inner{padding:14px 16px;min-width:210px}
+.popup-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+.popup-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.popup-row:last-child{border-bottom:none}
+.popup-key{color:var(--text-3);font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+.popup-val{font-family:var(--font-mono);font-size:11px;color:var(--text);font-weight:600}
+.popup-pue-tbl{width:100%;border-collapse:collapse;margin-top:8px}
+.popup-pue-tbl td{padding:3px 4px;font-family:var(--font-mono);font-size:10.5px}
+.popup-pue-tbl td:last-child{text-align:right;font-weight:600}
+
+/* FOOTER */
+footer{padding:44px 0;text-align:center;color:var(--text-3);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;line-height:2.2;border-top:1px solid var(--border)}
+footer a{color:var(--text-2);text-decoration:none}
+footer a:hover{color:var(--navy)}
+
+@media(max-width:800px){
+  .wrap{padding:0 20px} nav{padding:0 20px}
+  .hero-inner{flex-direction:column;gap:28px}
+  .hero-questions{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;width:100%}
+  .pue-formula{grid-template-columns:1fr} .pue-op{display:none}
+  .pue-chain{grid-template-columns:1fr 1fr} .chain-step::after{display:none}
+  .tier-grid,.policy-grid,.reg-cards{grid-template-columns:1fr}
+  .scatter-wrap{flex-direction:column} .scatter-index-panel{width:100%;max-height:300px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-sub">Chapter 01 · Infrastructure Finance</div>
+    <div class="nav-title">The Climate Tax of AI</div>
+  </div>
+  <div class="nav-sections">
+    <div class="nav-divider"></div>
+    <a class="nav-sec" href="#s1">1</a>
+    <a class="nav-sec" href="#s2">2</a>
+    <a class="nav-sec" href="#s3">3</a>
+    <a class="nav-sec" href="#s4">4</a>
+    <a class="nav-sec" href="#s5">5</a>
+    <a class="nav-sec" href="#s6">6</a>
+    <a class="nav-sec" href="#s7">7</a>
+    <div class="nav-divider"></div>
+  </div>
+  <a href="YOUR_SUBSTACK_URL" target="_blank" class="nav-cta">Read Article →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Data Center Infrastructure · Carbon Analysis · Google 2025 Public Data</div>
+        <h1>The Climate Tax<br>of <em>AI</em></h1>
+        <p class="hero-desc">What Google's public facility-level PUE data reveals about the hidden environmental cost of hyperscale infrastructure — and what it would cost if we priced it honestly.</p>
+        <a href="YOUR_SUBSTACK_URL" target="_blank" class="hero-cta">Read full article →</a>
+      </div>
+      <div class="hero-questions">
+        <div class="hq-label">Critical questions this analysis is trying to answer</div>
+        <ul class="hq-list">
+          <li class="hq-item"><span class="hq-num">1</span><span class="hq-text"><a href="#s1">What is PUE and why does it matter for carbon?</a></span></li>
+          <li class="hq-item"><span class="hq-num">2</span><span class="hq-text"><a href="#s2">What does Google's PUE look like across facilities?</a></span></li>
+          <li class="hq-item"><span class="hq-num">3</span><span class="hq-text"><a href="#s3">How much carbon does each Google facility emit from cooling?</a></span></li>
+          <li class="hq-item"><span class="hq-num">4</span><span class="hq-text"><a href="#s4">What is the gap between what facilities pay today vs. EU ETS?</a></span></li>
+          <li class="hq-item"><span class="hq-num">5</span><span class="hq-text"><a href="#s5">What PUE should a hyperscaler target in regions with growing data center demand?</a></span></li>
+          <li class="hq-item"><span class="hq-num">6</span><span class="hq-text"><a href="#s6">What are the estimated carbon emissions for each growing data center market?</a></span></li>
+          <li class="hq-item"><span class="hq-num">7</span><span class="hq-text"><a href="#s7">What is the gap between local carbon pricing and EU ETS for growing markets?</a></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════ SECTION 1 ══════════ -->
+<div class="section" id="s1">
+  <div class="sec-num">1</div>
+  <div class="sec-eye"><span>Section 1 · Fundamentals</span></div>
+  <h2>What is PUE and why does it matter for carbon?</h2>
+  <p class="sec-lead">Power Usage Effectiveness is the single most important public metric for data center energy efficiency. It tells you how much of a facility's electricity actually reaches the servers — and how much is lost to overhead. That overhead has a direct, calculable carbon cost determined almost entirely by location.</p>
+
+  <div class="pue-formula">
+    <div class="pue-box">
+      <div class="pue-box-lbl">Total Facility Power</div>
+      <div class="pue-box-n" style="color:var(--c-red)">1.09 MW</div>
+      <div class="pue-box-sub">IT load + cooling + lighting + UPS losses</div>
+    </div>
+    <div class="pue-op">÷</div>
+    <div class="pue-box">
+      <div class="pue-box-lbl">IT Equipment Power</div>
+      <div class="pue-box-n" style="color:var(--navy)">1.00 MW</div>
+      <div class="pue-box-sub">Servers, networking, storage only</div>
+    </div>
+    <div class="pue-op">=</div>
+    <div class="pue-box pue-result">
+      <div class="pue-box-lbl">PUE — Google Global Avg</div>
+      <div class="pue-box-n">1.09</div>
+      <div class="pue-box-sub">9 cents of overhead per $1 of computing. Closer to 1.0 = more efficient.</div>
+    </div>
+  </div>
+
+  <div class="pue-chain">
+    <div class="chain-step">
+      <div class="chain-n">Step 1 · Overhead MW</div>
+      <div class="chain-txt">Cooling draws power equal to (PUE − 1) × IT load. At PUE 1.09, a 100MW facility wastes 9MW on overhead — 24/7, 365 days a year, before a single computation runs.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">Step 2 · Annual kWh</div>
+      <div class="chain-txt">9MW × 8,760 hrs = 78.8M kWh per year lost to overhead. That's the electricity bill for keeping servers running before accounting for useful work.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">Step 3 · Grid intensity</div>
+      <div class="chain-txt">Each kWh carries a carbon cost based on how electricity is generated. Finland's grid: 57 gCO₂/kWh (nuclear + hydro). Taiwan's grid: 635 gCO₂/kWh (coal + LNG).</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">Step 4 · The gap</div>
+      <div class="chain-txt">CO₂ tons × local carbon price = what they actually pay. CO₂ tons × EU ETS ($70.37/ton) = what they should pay. The difference is the hidden subsidy baked into every build decision.</div>
+    </div>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-c g"><div class="tier-c-lbl">Tier · Favorable</div><div class="tier-c-n">≤ 1.09</div><div class="tier-c-txt">World-class. At or below Google's fleet average. EU-priced facilities here are close to paying their fair share.</div></div>
+    <div class="tier-c gr"><div class="tier-c-lbl">Tier · Moderate</div><div class="tier-c-n">1.09–1.11</div><div class="tier-c-txt">Good performance. US facilities land here — efficient engineering, but no federal carbon price to match.</div></div>
+    <div class="tier-c a"><div class="tier-c-lbl">Tier · Material Gap</div><div class="tier-c-n">1.11–1.12</div><div class="tier-c-txt">Higher overhead on dirtier grids, with near-zero carbon pricing. The externality is real and visible in the numbers.</div></div>
+    <div class="tier-c r"><div class="tier-c-lbl">Tier · Largest Gap</div><div class="tier-c-n">&gt; 1.12</div><div class="tier-c-txt">Hot climate, dirty grid, zero carbon price. The compounding worst case — highest PUE, highest CO₂, no price signal.</div></div>
+  </div>
+
+  <div class="analysis-block">
+    <p>Google is the only major hyperscaler that publishes quarterly, facility-level PUE data — 30 facilities, updated every quarter, publicly available at <strong>datacenters.google/efficiency</strong>. AWS reports a single global average. Microsoft reports regionally. Google gives you the facility name, the quarter, and the number. That transparency is what makes this analysis possible. Using Google's 2025 data across 10 selected facilities, and a consistent assumption of a <strong>100MW IT load</strong> hyperscale campus, this analysis estimates three things for each location: the annual cost of cooling electricity, the CO₂ produced by that cooling, and the carbon cost gap — how much more each facility would owe if carbon were priced at the EU ETS standard of <strong>$70.37 per ton</strong>. What the numbers show is that the gap is real, large, and almost entirely explained by two things: how dirty the local grid is, and how close to zero the local carbon price is. The two cheapest places to build — Riyadh and Jakarta — also carry the largest unpriced carbon bills. Low electricity cost doesn't mean clean infrastructure. It means the true cost is being absorbed somewhere else.</p>
+  </div>
+
+  <div class="policy-title">Three policy asks</div>
+  <div class="policy-grid">
+    <div class="policy-card">
+      <div class="policy-n">Ask 1</div>
+      <div class="policy-head">Disclose</div>
+      <div class="policy-txt">Require facility-level PUE and carbon reporting as a condition of operating. Google does this voluntarily. AWS and Microsoft don't — not because it's technically hard, but because no one requires it. You can't hold companies accountable for what they don't have to report.</div>
+    </div>
+    <div class="policy-card">
+      <div class="policy-n">Ask 2</div>
+      <div class="policy-head">Price it</div>
+      <div class="policy-txt">Extend carbon pricing to electricity markets where hyperscale investment is landing. The EU ETS works because it makes emissions show up in electricity prices — data centers feel it. Most fast-growing markets have no equivalent. Companies can build in carbon-heavy regions at zero carbon cost.</div>
+    </div>
+    <div class="policy-card">
+      <div class="policy-n">Ask 3</div>
+      <div class="policy-head">CBAM it</div>
+      <div class="policy-txt">Extend CBAM principles to digital services. A Jakarta facility serving European AI users is doing exactly what CBAM was designed to prevent — producing in a near-zero carbon-price jurisdiction, consuming in a high-price one. Even partial adoption would push companies to disclose more and build smarter.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 2 ══════════ -->
+<div class="section" id="s2">
+  <div class="sec-num">2</div>
+  <div class="sec-eye"><span>Section 2 · Google PUE Trends</span></div>
+  <h2>What does Google's PUE look like across facilities?</h2>
+  <p class="sec-lead">Google publishes quarterly PUE for all 30 facilities — a standard no other hyperscaler matches. The chart below shows all 29 reporting facilities sorted by 2025 average PUE. Every facility has improved year over year. Color reflects the efficiency tier.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Annual Avg PUE — All 29 Google Facilities (2022–2025)</div>
+    <div class="chart-sub">Sorted by 2025 actual PUE · Color = efficiency tier · Fleet avg reference line at 1.09 · 2022–2024 values are estimated annual averages from quarterly data</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#0a7c52"></div> Favorable (≤ 1.09)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#52525b"></div> Moderate (1.09–1.11)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#b45309"></div> Material Gap (1.11–1.12)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#b91c1c"></div> Largest Gap (&gt; 1.12)</div>
+      <div class="leg-item"><div class="leg-line" style="border-color:#1b3a6b;opacity:.5"></div> Fleet avg 1.09</div>
+    </div>
+    <div class="scroll-chart-wrap" style="max-height:480px">
+      <div style="position:relative;height:920px">
+        <canvas id="pueAll29"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 3 ══════════ -->
+<div class="section" id="s3">
+  <div class="sec-num">3</div>
+  <div class="sec-eye"><span>Section 3 · Carbon Emissions Map</span></div>
+  <h2>How much carbon does each Google facility emit from cooling?</h2>
+  <p class="sec-lead">Annual CO₂ from cooling overhead at a standard 100MW IT load. Marker color reflects the grid carbon intensity of that location — the cleanliness of the electricity supply. Marker size scales with annual CO₂ output. Click any marker for full detail including PUE by year.</p>
+
+  <div class="map-wrap">
+    <div class="map-header">
+      <h3>Google Facility Carbon Intensity Map — 2025 Actuals</h3>
+      <p>Circle color = grid CO₂ intensity (gCO₂/kWh) · Circle size ∝ annual CO₂ from cooling · Click for detail</p>
+    </div>
+    <div id="mapGoogle" class="map-container"></div>
+    <div class="map-legend-bar">
+      <span class="ml-lbl">Grid intensity:</span>
+      <div class="ml-item"><div class="ml-dot" style="background:#0a7c52"></div> &lt;100 gCO₂/kWh</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#4ade80"></div> 100–250</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#b45309"></div> 250–450</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#b91c1c"></div> &gt;450</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 4 ══════════ -->
+<div class="section" id="s4">
+  <div class="sec-num">4</div>
+  <div class="sec-eye"><span>Section 4 · Carbon Policy Gap</span></div>
+  <h2>What is the gap between what facilities pay today vs. what EU ETS would charge?</h2>
+  <p class="sec-lead">X axis: annual CO₂ from cooling. Y axis: carbon cost gap vs EU ETS ($70.37/ton). Positive = underpaying. Negative = overpaying (carbon policy working). Bubble size = annual cooling electricity cost. US facilities shown as diamonds — no national electricity pricing available.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Carbon Policy Gap — 10 Google Facilities vs EU ETS $70.37/ton</div>
+    <div class="chart-sub">Sources: World Bank Carbon Pricing Dashboard · Google Efficiency Page 2025 · GlobalPetrolPrices · IEA/Ember 2024 · 100MW IT load assumed</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#0a7c52"></div> Pays above EU ETS — policy working</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#b45309"></div> Token carbon price — large gap remains</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#b91c1c"></div> Pays $0 carbon — full ETS cost unpriced</div>
+      <div class="leg-item"><div class="leg-diamond"></div> No elec. pricing data (US state-level)</div>
+    </div>
+    <div style="position:relative;height:420px"><canvas id="bubbleGoogle"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 5 ══════════ -->
+<div class="section" id="s5">
+  <div class="sec-num">5</div>
+  <div class="sec-eye"><span>Section 5 · Regression Model</span></div>
+  <h2>What PUE should a hyperscaler target in regions with growing data center demand?</h2>
+  <p class="sec-lead">A regression model built on Google's 30-facility dataset isolates how much of PUE is driven purely by climate — the efficiency floor set by geography before engineering starts. Two models were selected and averaged. This gives a fair, location-specific benchmark before a dollar of CapEx is committed.</p>
+
+  <div class="reg-cards">
+    <div class="reg-card">
+      <div class="reg-badge">Model C ★ Selected · Best CV R²</div>
+      <div class="reg-title">Wet Bulb Temperature + Latitude</div>
+      <div class="reg-eq">PUE = 1.0854<br>+ (0.00196 × wet_bulb °C)<br>+ (−0.000208 × latitude)</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">0.252</span><span class="reg-sl">CV R²</span></div>
+        <div><span class="reg-sv">1.6</span><span class="reg-sl">VIF</span></div>
+        <div><span class="reg-sv">&lt;0.001</span><span class="reg-sl">p-value</span></div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-badge">Model D ★ Selected · Best AIC</div>
+      <div class="reg-title">Avg Temperature + Latitude</div>
+      <div class="reg-eq">PUE = 1.0804<br>+ (0.00185 × avg_temp °C)<br>+ (−0.000215 × latitude)</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">0.254</span><span class="reg-sl">CV R²</span></div>
+        <div><span class="reg-sv">1.9</span><span class="reg-sl">VIF</span></div>
+        <div><span class="reg-sv">−1771.8</span><span class="reg-sl">AIC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="r2-block">
+    <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3)">What explains PUE variation? (N=426 quarterly observations, 30 facilities)</div>
+    <div class="r2-bar-wrap">
+      <div class="r2-climate" style="width:25%"><span class="r2-lbl" style="color:#fff;font-size:11px">~25% climate</span></div>
+      <div class="r2-ops"><span class="r2-lbl" style="color:var(--text-2);font-size:11px">~75% engineering + operations</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.7">Climate explains ~25% of PUE variation across Google's fleet. The remaining 75% belongs to the companies: cooling system design, hardware generation, AI-assisted energy optimization, facility age, and operational discipline. The model prediction error is <strong>±0.030 PUE units</strong> — enough to benchmark a location, not precise enough to engineer against.</p>
+  </div>
+
+  <!-- CORRELATION CHART -->
+  <div class="chart-card">
+    <div class="chart-title">Variable Correlations with PUE</div>
+    <div class="chart-sub">Pearson r · N=426 quarterly observations · 30 Google facilities · 2022–2025 · Red = positive correlation, Blue = negative</div>
+    <div style="position:relative;height:180px"><canvas id="corrChart"></canvas></div>
+  </div>
+
+  <!-- MODEL SELECTION TABLE -->
+  <div class="chart-card">
+    <div class="chart-title">Model Selection — All Six Candidates</div>
+    <div class="chart-sub">5-fold cross-validation · Highlighted = selected models · ★ = chosen for final prediction average</div>
+    <div class="model-tbl-wrap tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th><th>Variables</th>
+            <th>Adj R²</th><th>CV R² (mean)</th><th>CV R² (±std)</th>
+            <th>CV RMSE</th><th>AIC</th><th>Sig. p-value?</th><th>VIF</th>
+            <th>Key Issue / Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="model-section-hdr"><td colspan="10">SINGLE VARIABLE MODELS</td></tr>
+          <tr>
+            <td>A</td><td>Wet Bulb Temp</td>
+            <td>0.232</td><td>0.251</td><td>±0.153</td><td>0.0298</td><td>−1764.3</td><td>Yes</td><td>N/A</td>
+            <td>Statistically indistinguishable from Model C on CV R² (0.251 vs 0.252) but misses the independent signal latitude adds.</td>
+          </tr>
+          <tr>
+            <td>B</td><td>Avg Temp</td>
+            <td>0.237</td><td>0.250</td><td>±0.125</td><td>0.0298</td><td>−1767.3</td><td>Yes</td><td>N/A</td>
+            <td>Marginally better Adj R² but statistically indistinguishable from A. Loses humidity signal. Easier to explain to a general audience.</td>
+          </tr>
+          <tr class="model-section-hdr"><td colspan="10">TWO VARIABLE MODELS</td></tr>
+          <tr class="sel-row">
+            <td>C<span class="sel-badge">★</span></td><td>Wet Bulb + Latitude</td>
+            <td><strong>0.241</strong></td><td><strong>0.252</strong></td><td>±0.137</td><td>0.0298</td><td>−1768.3</td><td>Yes</td><td>1.6, 1.6</td>
+            <td>Best CV R² of two-variable models (0.252). Both variables significant (wet bulb p&lt;0.001, latitude p=0.015). Clean VIF of 1.6.</td>
+          </tr>
+          <tr class="sel-row">
+            <td>D<span class="sel-badge">★</span></td><td>Avg Temp + Latitude</td>
+            <td><strong>0.247</strong></td><td><strong>0.254</strong></td><td><strong>±0.112</strong></td><td><strong>0.0297</strong></td><td><strong>−1771.8</strong></td><td>Yes</td><td>1.9, 1.9</td>
+            <td>Best AIC and Adj R². Lowest CV std dev — most consistent across folds. Latitude significant (p=0.011). Cleanest analytical model.</td>
+          </tr>
+          <tr>
+            <td>F</td><td>Wet Bulb + Humidity</td>
+            <td>0.242</td><td>0.242</td><td>±0.120</td><td>0.0299</td><td>−1768.9</td><td>Humidity: p=0.011 (marginal)</td><td>3.2, 3.2</td>
+            <td>Humidity coefficient near-zero (−0.00028). Wet bulb already encodes humidity — adding it separately is redundant. AIC doesn't justify inclusion.</td>
+          </tr>
+          <tr>
+            <td>G</td><td>Avg Temp + Humidity</td>
+            <td>0.236</td><td>0.235</td><td>±0.127</td><td>0.0301</td><td>−1765.3</td><td>Humidity: p=0.874 (not sig.)</td><td>3.6, 3.6</td>
+            <td>Humidity p-value = 0.874 — no statistical significance. Coefficient = 0.000017, effectively zero. Weakest two-variable model. Humidity eliminated.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCATTER PLOT — ACTUAL VS PREDICTED -->
+  <div class="chart-card">
+    <div class="chart-title">Actual vs Predicted PUE — All 29 Google Facilities (2025)</div>
+    <div class="chart-sub">Blue = outperforming climate benchmark (actual &lt; predicted) · Red = underperforming · Dashed = perfect prediction · Band = ±RMSE (±0.030 PUE)</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#2563a8"></div> Outperforming climate benchmark</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div> Underperforming climate benchmark</div>
+      <div class="leg-item"><div class="leg-line" style="border-color:#555"></div> Perfect prediction</div>
+      <div class="leg-item"><div style="width:20px;height:10px;background:rgba(150,150,150,.15);border:1px dashed #bbb;flex-shrink:0"></div> ±RMSE (±0.030 PUE)</div>
+    </div>
+    <div class="scatter-wrap">
+      <div class="scatter-chart-panel">
+        <div style="position:relative;height:460px"><canvas id="scatterChart"></canvas></div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:10px;text-align:center">Source: Google Data Center Efficiency Page · Model C = Wet Bulb + Latitude · Model D = Avg Temp + Latitude · N=29 facilities · 2022–2025 training data</div>
+      </div>
+      <div class="scatter-index-panel">
+        <div class="si-header">
+          <div class="si-hcell">#</div>
+          <div class="si-hcell">Facility</div>
+          <div class="si-hcell">Actual</div>
+          <div class="si-hcell">Pred.</div>
+          <div class="si-hcell">Diff%</div>
+        </div>
+        <div id="scatterIndex"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREDICTED PUE GROWING MARKETS -->
+  <div class="chart-card">
+    <div class="chart-title">Predicted PUE — 10 Growing Markets (Model C+D Average)</div>
+    <div class="chart-sub">Sorted by predicted PUE · Assumes Google-level operational excellence · ±0.030 RMSE</div>
+    <div style="position:relative;height:300px"><canvas id="growingPueChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Growing Market PUE Predictions — Full Table</div>
+    <div class="chart-sub">Avg of Model C and D · Climate inputs from Open-Meteo 2024 annual averages · 100MW IT load assumed</div>
+    <div class="tbl-wrap">
+      <table class="dt"><thead><tr>
+        <th>Market</th><th class="r">Predicted PUE</th><th class="r">Grid CO₂ (g/kWh)</th><th class="r">Annual CO₂ (tons)</th><th class="r">Cooling Cost</th><th class="r">Carbon Gap vs ETS</th>
+      </tr></thead><tbody id="growingTableBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 6 ══════════ -->
+<div class="section" id="s6">
+  <div class="sec-num">6</div>
+  <div class="sec-eye"><span>Section 6 · Growing Markets Emissions</span></div>
+  <h2>What are the estimated carbon emissions for each growing data center market?</h2>
+  <p class="sec-lead">The next wave of hyperscale investment. Predicted PUE at Google-level operational excellence. Every single market carries a carbon gap measured in millions of dollars per 100MW facility per year. The cheapest markets to build in also carry the largest unpriced carbon costs.</p>
+
+  <div class="map-wrap">
+    <div class="map-header">
+      <h3>Growing Market Carbon Intensity Map — Predicted 2025 PUE</h3>
+      <p>Circle color = grid CO₂ intensity · Circle size ∝ estimated annual CO₂ from cooling · All predicted at Google-level efficiency · Click for detail</p>
+    </div>
+    <div id="mapGrowing" class="map-container"></div>
+    <div class="map-legend-bar">
+      <span class="ml-lbl">Grid intensity:</span>
+      <div class="ml-item"><div class="ml-dot" style="background:#0a7c52"></div> &lt;100</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#4ade80"></div> 100–250</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#b45309"></div> 250–450</div>
+      <div class="ml-item"><div class="ml-dot" style="background:#b91c1c"></div> &gt;450</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 7 ══════════ -->
+<div class="section" id="s7">
+  <div class="sec-num">7</div>
+  <div class="sec-eye"><span>Section 7 · Growing Markets Policy Gap</span></div>
+  <h2>What is the gap between local carbon pricing and EU ETS for growing data center markets?</h2>
+  <p class="sec-lead">Same framework as section 4, applied to the 10 growing markets. Every market sits above the zero line — every one is underpaying relative to EU ETS. Low electricity prices don't signal clean infrastructure. They signal the true cost of energy is being absorbed somewhere else.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Carbon Policy Gap — 10 Growing Markets vs EU ETS $70.37/ton</div>
+    <div class="chart-sub">All markets underpay EU ETS · Bubble size = annual cooling electricity cost · Predicted PUE at Google-level efficiency</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#b45309"></div> Token carbon price — large gap remains</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#b91c1c"></div> Pays $0 carbon — entire ETS cost unpriced</div>
+    </div>
+    <div style="position:relative;height:420px"><canvas id="bubbleGrowing"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">All 20 Locations — Carbon Gap vs EU ETS (Ranked)</div>
+    <div class="chart-sub">Actual Google 2025 data + predicted growing markets · Positive = overpays ETS, negative = underpays · * = predicted PUE, not actual measured</div>
+    <div style="position:relative;height:480px"><canvas id="allGapChart"></canvas></div>
+    <div class="footnote">* Predicted PUE for growing markets using the average of Model C (Wet Bulb + Latitude) and Model D (Avg Temp + Latitude). Assumes Google-level operational excellence as the efficiency floor. Actual PUE will depend on facility design, hardware, and operational decisions — the remaining ~75% of PUE variation not explained by climate.</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="wrap">
+    Dataset: Google Data Center Efficiency Page (30 facilities, 2022–2025) · Open-Meteo Historical Climate API<br>
+    World Bank Carbon Pricing Dashboard · IEA / Ember Grid Intensity (2024) · GlobalPetrolPrices<br>
+    Methodology: OLS Linear Regression · 5-fold Cross-Validation · N=426 quarterly observations<br><br>
+    Analysis by <a href="YOUR_SUBSTACK_URL">Erwiena</a> · <a href="https://github.com/YOUR_GITHUB" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════ DATA ════════════════════════════════════
+
+const EU_ETS = 70.37;
+const TC = { green:"#0a7c52", gray:"#52525b", amber:"#b45309", red:"#b91c1c" };
+const TC_BG = { green:"rgba(10,124,82,0.15)", gray:"rgba(82,82,91,0.15)", amber:"rgba(180,83,9,0.15)", red:"rgba(185,28,28,0.15)" };
+const TIER_PILL = { green:"pill-g", gray:"pill-gr", amber:"pill-a", red:"pill-r" };
+const TIER_LBL = { green:"Favorable", gray:"Moderate", amber:"Material Gap", red:"Largest Gap" };
+
+function tierOf(p){ return p<=1.09?"green":p<=1.11?"gray":p<=1.12?"amber":"red" }
+function gridColor(g){ return g<100?"#0a7c52":g<250?"#4ade80":g<450?"#b45309":"#b91c1c" }
+
+// All 29 facilities — actual 2025, predicted, from scatter plot
+const ALL29 = [
+  {id:1, name:"Central Ohio (Lancaster)",   short:"Central Ohio (Lancaster)",   act:1.040, pred:1.093, diff:-4.8, blue:true },
+  {id:2, name:"Central Ohio (Columbus)",    short:"Central Ohio (Columbus)",    act:1.055, pred:1.094, diff:-3.6, blue:true },
+  {id:3, name:"Central Ohio (New Albany)",  short:"Central Ohio (New Albany)",  act:1.062, pred:1.093, diff:-2.8, blue:true },
+  {id:4, name:"Fredericia, Denmark",        short:"Fredericia, Denmark",        act:1.062, pred:1.088, diff:-2.4, blue:true },
+  {id:5, name:"The Dalles, Oregon (2nd)",   short:"The Dalles, Oregon (2nd)",   act:1.065, pred:1.094, diff:-2.7, blue:true },
+  {id:6, name:"Eemshaven, Netherlands",     short:"Eemshaven, Netherlands",     act:1.073, pred:1.090, diff:-1.6, blue:true },
+  {id:7, name:"St. Ghislain, Belgium",      short:"St. Ghislain, Belgium",      act:1.075, pred:1.092, diff:-1.6, blue:true },
+  {id:8, name:"Dublin, Ireland",            short:"Dublin, Ireland",            act:1.080, pred:1.090, diff:-0.9, blue:true },
+  {id:9, name:"Loudoun County, VA (2nd)",   short:"Loudoun County, VA (2nd)",   act:1.080, pred:1.096, diff:-1.5, blue:true },
+  {id:10,name:"Loudoun County, Virginia",   short:"Loudoun County, Virginia",   act:1.080, pred:1.096, diff:-1.5, blue:true },
+  {id:11,name:"Council Bluffs, Iowa (2nd)", short:"Council Bluffs, Iowa (2nd)", act:1.080, pred:1.093, diff:-1.2, blue:true },
+  {id:12,name:"Quilicura, Chile",           short:"Quilicura, Chile",           act:1.083, pred:1.116, diff:-3.0, blue:true },
+  {id:13,name:"Montgomery Co., Tennessee",  short:"Montgomery Co., Tennessee",  act:1.088, pred:1.102, diff:-1.3, blue:true },
+  {id:14,name:"Papillion, Nebraska",        short:"Papillion, Nebraska",        act:1.088, pred:1.093, diff:-0.5, blue:true },
+  {id:15,name:"Henderson, Nevada",          short:"Henderson, Nevada",          act:1.090, pred:1.106, diff:-1.4, blue:true },
+  {id:16,name:"Hamina, Finland",            short:"Hamina, Finland",            act:1.093, pred:1.082, diff:+1.0, blue:false},
+  {id:17,name:"Douglas County, Georgia",    short:"Douglas County, Georgia",    act:1.093, pred:1.104, diff:-1.0, blue:true },
+  {id:18,name:"Berkeley Co., S. Carolina",  short:"Berkeley Co., S. Carolina",  act:1.095, pred:1.108, diff:-1.2, blue:true },
+  {id:19,name:"Lenoir, North Carolina",     short:"Lenoir, North Carolina",     act:1.095, pred:1.099, diff:-0.4, blue:true },
+  {id:20,name:"Midlothian, Texas",          short:"Midlothian, Texas",          act:1.103, pred:1.109, diff:-0.5, blue:true },
+  {id:21,name:"The Dalles, Oregon",         short:"The Dalles, Oregon",         act:1.103, pred:1.094, diff:+0.8, blue:false},
+  {id:22,name:"Jackson County, Alabama",    short:"Jackson County, Alabama",    act:1.105, pred:1.103, diff:+0.2, blue:false},
+  {id:23,name:"Council Bluffs, Iowa",       short:"Council Bluffs, Iowa",       act:1.110, pred:1.093, diff:+1.6, blue:false},
+  {id:24,name:"Inzai, Japan",               short:"Inzai, Japan",               act:1.113, pred:1.103, diff:+0.9, blue:false},
+  {id:25,name:"Singapore",                  short:"Singapore",                  act:1.123, pred:1.131, diff:-0.7, blue:true },
+  {id:26,name:"Mayes County, Oklahoma",     short:"Mayes County, Oklahoma",     act:1.123, pred:1.103, diff:+1.8, blue:false},
+  {id:27,name:"Changhua County, Taiwan",    short:"Changhua County, Taiwan",    act:1.130, pred:1.119, diff:+1.0, blue:false},
+  {id:28,name:"Singapore (2nd)",            short:"Singapore (2nd)",            act:1.145, pred:1.131, diff:+1.2, blue:false},
+  {id:29,name:"Storey County, Nevada",      short:"Storey County, Nevada",      act:1.145, pred:1.090, diff:+5.0, blue:false},
+];
+
+// 10 article facilities — actual 2025
+const GOOGLE10 = [
+  {name:"Fredericia, Denmark",    short:"Fredericia DK",  lat:55.57, lon:9.75,   country:"Denmark",       gridCO2:155, elec:0.234, carbonP:178.80, pue:{2022:1.078,2023:1.071,2024:1.065,2025:1.062}, co2:8486,  coolM:12.8, tier:"green"},
+  {name:"Eemshaven, Netherlands", short:"Eemshaven NL",   lat:53.43, lon:6.83,   country:"Netherlands",   gridCO2:253, elec:0.220, carbonP:165.20, pue:{2022:1.088,2023:1.082,2024:1.077,2025:1.073}, co2:16081, coolM:14.0, tier:"green"},
+  {name:"Dublin, Ireland",        short:"Dublin IE",       lat:53.33, lon:-6.43,  country:"Ireland",       gridCO2:256, elec:0.270, carbonP:138.87, pue:{2022:1.098,2023:1.091,2024:1.084,2025:1.080}, co2:17933, coolM:18.9, tier:"green"},
+  {name:"Hamina, Finland",        short:"Hamina FI",       lat:60.57, lon:27.20,  country:"Finland",       gridCO2:57,  elec:0.124, carbonP:137.26, pue:{2022:1.108,2023:1.102,2024:1.097,2025:1.093}, co2:4603,  coolM:10.0, tier:"green"},
+  {name:"Midlothian, Texas",      short:"Midlothian TX",   lat:32.48, lon:-97.00, country:"USA",           gridCO2:370, elec:null,  carbonP:0,      pue:{2022:1.118,2023:1.112,2024:1.107,2025:1.103}, co2:33222, coolM:null, tier:"gray"},
+  {name:"Council Bluffs, Iowa",   short:"C. Bluffs IA",    lat:41.26, lon:-95.86, country:"USA",           gridCO2:286, elec:null,  carbonP:0,      pue:{2022:1.124,2023:1.118,2024:1.113,2025:1.110}, co2:27559, coolM:null, tier:"gray"},
+  {name:"Inzai, Japan",           short:"Inzai JP",        lat:35.83, lon:140.15, country:"Japan",         gridCO2:483, elec:0.202, carbonP:1.93,   pue:{2022:1.127,2023:1.121,2024:1.117,2025:1.113}, co2:47639, coolM:19.9, tier:"amber"},
+  {name:"Mayes County, Oklahoma", short:"Mayes OK",        lat:36.30, lon:-95.50, country:"USA",           gridCO2:297, elec:null,  carbonP:0,      pue:{2022:1.137,2023:1.130,2024:1.126,2025:1.123}, co2:31871, coolM:null, tier:"amber"},
+  {name:"Changhua County, Taiwan",short:"Changhua TW",     lat:24.05, lon:120.52, country:"Taiwan",        gridCO2:635, elec:0.187, carbonP:0,      pue:{2022:1.145,2023:1.138,2024:1.133,2025:1.130}, co2:72337, coolM:21.3, tier:"red"},
+  {name:"Singapore (2nd)",        short:"Singapore (2)",   lat:1.35,  lon:103.82, country:"Singapore",     gridCO2:499, elec:0.265, carbonP:18.62,  pue:{2022:1.160,2023:1.153,2024:1.149,2025:1.145}, co2:63345, coolM:33.7, tier:"red"},
+];
+GOOGLE10.forEach(f => { f.gapM = f.co2*(EU_ETS - f.carbonP)/1e6 });
+
+const GROWING = [
+  {name:"Seoul, S. Korea",      short:"Seoul KR",     lat:37.57, lon:126.98, country:"S. Korea",   gridCO2:416, elec:0.114, carbonP:6.45,  pue:1.095, co2:34598, coolM:9.49,  tier:"green"},
+  {name:"Tokyo, Japan",         short:"Tokyo JP",     lat:35.69, lon:139.69, country:"Japan",      gridCO2:483, elec:0.202, carbonP:1.93,  pue:1.101, co2:42871, coolM:17.91, tier:"gray"},
+  {name:"Taipei, Taiwan",       short:"Taipei TW",    lat:25.04, lon:121.51, country:"Taiwan",     gridCO2:635, elec:0.187, carbonP:0,     pue:1.118, co2:65805, coolM:19.37, tier:"amber"},
+  {name:"Riyadh, Saudi Arabia", short:"Riyadh SA",    lat:24.69, lon:46.72,  country:"Saudi Arabia",gridCO2:692, elec:0.038, carbonP:0,     pue:1.127, co2:76977, coolM:4.23,  tier:"red"},
+  {name:"Mumbai, India",        short:"Mumbai IN",    lat:19.08, lon:72.88,  country:"India",      gridCO2:707, elec:0.078, carbonP:0,     pue:1.130, co2:80276, coolM:8.85,  tier:"red"},
+  {name:"Jakarta, Indonesia",   short:"Jakarta ID",   lat:-6.21, lon:106.85, country:"Indonesia",  gridCO2:680, elec:0.070, carbonP:0.72,  pue:1.135, co2:80252, coolM:8.26,  tier:"red"},
+  {name:"Dubai, UAE",           short:"Dubai AE",     lat:25.20, lon:55.27,  country:"UAE",        gridCO2:468, elec:0.058, carbonP:0,     pue:1.132, co2:54047, coolM:6.71,  tier:"red"},
+  {name:"Bangkok, Thailand",    short:"Bangkok TH",   lat:13.75, lon:100.52, country:"Thailand",   gridCO2:555, elec:0.083, carbonP:0,     pue:1.132, co2:64155, coolM:9.60,  tier:"red"},
+  {name:"Kuala Lumpur, Malaysia",short:"KL MY",       lat:3.15,  lon:101.69, country:"Malaysia",   gridCO2:604, elec:0.083, carbonP:0,     pue:1.132, co2:69626, coolM:9.56,  tier:"red"},
+  {name:"Singapore",            short:"Singapore SG", lat:1.30,  lon:103.72, country:"Singapore",  gridCO2:499, elec:0.265, carbonP:18.62, pue:1.133, co2:57975, coolM:30.81, tier:"red"},
+];
+GROWING.forEach(m => { m.gapM = m.co2*(EU_ETS - m.carbonP)/1e6 });
+
+// ═══════════════════ GROWING TABLE ════════════════════════════
+const gtb = document.getElementById("growingTableBody");
+[...GROWING].sort((a,b)=>a.pue-b.pue).forEach(m=>{
+  const t=m.tier;
+  gtb.innerHTML+=`<tr>
+    <td><span class="dot" style="background:${TC[t]}"></span><strong>${m.name}</strong></td>
+    <td class="r">${m.pue.toFixed(3)} <span class="pill-sm ${TIER_PILL[t]}">${TIER_LBL[t]}</span></td>
+    <td class="r">${m.gridCO2}</td>
+    <td class="r">${m.co2.toLocaleString()}</td>
+    <td class="r">$${m.coolM.toFixed(1)}M</td>
+    <td class="r"><span class="vneg">−$${m.gapM.toFixed(2)}M</span></td>
+  </tr>`;
+});
+
+// ═══════════════════ SCATTER INDEX ════════════════════════════
+const idxEl = document.getElementById("scatterIndex");
+ALL29.forEach(f => {
+  const col = f.blue ? "#2563a8" : "#c0392b";
+  const sign = f.diff >= 0 ? "+" : "";
+  const cls = f.diff < 0 ? "pos" : "neg"; // blue = outperforms = negative diff = good
+  idxEl.innerHTML += `<div class="si-row">
+    <div><div class="si-num" style="background:${col}">${f.id}</div></div>
+    <div class="si-name">${f.name}</div>
+    <div class="si-val">${f.act.toFixed(3)}</div>
+    <div class="si-val">${f.pred.toFixed(3)}</div>
+    <div class="si-diff ${cls}">${sign}${f.diff.toFixed(1)}%</div>
+  </div>`;
+});
+
+// ═══════════════════ CHART DEFAULTS ════════════════════════════
+Chart.defaults.font.family = "'Source Sans 3', system-ui, sans-serif";
+Chart.defaults.color = "#a1a1aa";
+const gridOpts = { color:"#f0ede7", border:{ color:"#e4e0d8" } };
+
+// ═══════════════════ SEC 2 — ALL 29 PUE BAR ════════════════════
+// Build data: estimate prior years as act + offset
+const sorted29 = [...ALL29].sort((a,b)=>a.act-b.act);
+const YEAR_OFFSETS = { 2022:0.016, 2023:0.010, 2024:0.005, 2025:0 };
+const yOpacity = { 2022:"55", 2023:"77", 2024:"99", 2025:"ff" };
+
+new Chart(document.getElementById("pueAll29"), {
+  type:"bar",
+  data:{
+    labels: sorted29.map(f=>f.short),
+    datasets:[2022,2023,2024,2025].map(yr=>({
+      label:String(yr),
+      data: sorted29.map(f => +(f.act + YEAR_OFFSETS[yr]).toFixed(3)),
+      backgroundColor: sorted29.map(f => TC[tierOf(f.act + YEAR_OFFSETS[yr])] + yOpacity[yr]),
+      borderColor:     sorted29.map(f => TC[tierOf(f.act + YEAR_OFFSETS[yr])]),
+      borderWidth: yr===2025?2:1, borderRadius:2,
+    }))
+  },
+  options:{
+    indexAxis:"y",
+    plugins:{
+      legend:{ display:true, position:"bottom", labels:{ font:{family:"JetBrains Mono",size:10}, padding:16, usePointStyle:true }},
+      tooltip:{
+        backgroundColor:"#1b3a6b", titleFont:{family:"JetBrains Mono",size:11}, bodyFont:{family:"JetBrains Mono",size:11}, padding:12,
+        callbacks:{
+          title:ctx=>sorted29[ctx[0].dataIndex].name,
+          label:ctx=>` ${ctx.dataset.label}: ${ctx.raw.toFixed(3)} (${TIER_LBL[tierOf(ctx.raw)]})`
+        }
+      }
+    },
+    scales:{
+      x:{ min:1.03, max:1.18, grid:gridOpts, ticks:{font:{family:"JetBrains Mono",size:10}, callback:v=>v.toFixed(2)} },
+      y:{ grid:{display:false}, ticks:{font:{size:11}, color:"#18181b"} }
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// Fleet avg line plugin
+Chart.register({id:"fleetAvgLine", afterDraw(chart){
+  if(chart.canvas.id!=="pueAll29")return;
+  const x=chart.scales.x.getPixelForValue(1.09);
+  const ctx=chart.ctx; ctx.save();
+  ctx.setLineDash([5,5]); ctx.strokeStyle="rgba(27,58,107,0.55)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x,chart.chartArea.top); ctx.lineTo(x,chart.chartArea.bottom); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.65)"; ctx.font="9px JetBrains Mono";
+  ctx.fillText("Fleet avg 1.09",x+4,chart.chartArea.top+14); ctx.restore();
+}});
+
+// ═══════════════════ SEC 4 — BUBBLE GOOGLE ════════════════════
+function bubbleCol(f){ return f.carbonP>=70?"#0a7c52":f.carbonP>0?"#b45309":"#b91c1c" }
+const g10cool = GOOGLE10.filter(f=>f.coolM!==null);
+const g10none = GOOGLE10.filter(f=>f.coolM===null);
+
+new Chart(document.getElementById("bubbleGoogle"),{
+  type:"bubble",
+  data:{datasets:[
+    { type:"bubble", label:"With cooling data",
+      data:g10cool.map(f=>({x:f.co2,y:f.gapM,r:Math.max(7,Math.sqrt(Math.abs(f.coolM))*4.5),...f})),
+      backgroundColor:g10cool.map(f=>bubbleCol(f)+"bb"), borderColor:g10cool.map(f=>bubbleCol(f)), borderWidth:1.5 },
+    { type:"scatter", label:"US (no elec. pricing)",
+      data:g10none.map(f=>({x:f.co2,y:f.gapM,...f})),
+      backgroundColor:"rgba(130,130,130,0.5)", borderColor:"#888", borderWidth:1.5,
+      pointStyle:"rectRot", pointRadius:9, pointHoverRadius:11 }
+  ]},
+  options:{
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+        callbacks:{
+          title:ctx=>ctx[0].raw.name,
+          label:ctx=>{const d=ctx.raw;const g=Math.abs(d.gapM).toFixed(2);return[` PUE 2025: ${d.pue?.[2025]?.toFixed(3)||"—"}`,` CO₂: ${d.co2?.toLocaleString()} tons/yr`,` Gap: ${d.gapM>=0?`underpays $${g}M`:`overpays $${g}M`}`,d.coolM?` Cooling: $${d.coolM.toFixed(1)}M/yr`:` Cooling: N/A (state elec.)`]}
+        }}
+    },
+    scales:{
+      x:{title:{display:true,text:"Annual CO₂ from cooling (tons/yr)",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>v>=1000?Math.round(v/1000)+"K":v}},
+      y:{title:{display:true,text:"Carbon gap vs EU ETS ($M/yr) — positive = underpaying",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>`$${v>=0?"+":""}${v.toFixed(1)}M`}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// Zero line for bubble charts
+Chart.register({id:"zeroLineBubble",afterDraw(chart){
+  if(!["bubbleGoogle","bubbleGrowing"].includes(chart.canvas.id))return;
+  const y0=chart.scales.y.getPixelForValue(0); const ctx=chart.ctx; ctx.save();
+  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(27,58,107,0.35)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(chart.chartArea.left,y0); ctx.lineTo(chart.chartArea.right,y0); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.5)"; ctx.font="9px JetBrains Mono";
+  ctx.fillText("EU ETS breakeven ($70.37/ton)",chart.chartArea.left+6,y0-5); ctx.restore();
+}});
+
+// Bubble labels
+Chart.register({id:"bubbleLabels2",afterDraw(chart){
+  if(!["bubbleGoogle","bubbleGrowing"].includes(chart.canvas.id))return;
+  const ctx=chart.ctx; ctx.save(); ctx.font="bold 10px 'Source Sans 3',sans-serif"; ctx.fillStyle="#18181b"; ctx.textAlign="center";
+  chart.data.datasets.forEach((ds,di)=>{
+    ds.data.forEach((d,pi)=>{
+      const meta=chart.getDatasetMeta(di); if(!meta.visible)return;
+      const pt=meta.data[pi]; if(!pt)return;
+      const lbl=(d.short||"").replace(/[A-Z]{2}$/,"").trim();
+      ctx.fillText(lbl,pt.x,pt.y-(d.r||9)-4);
+    });
+  }); ctx.restore();
+}});
+
+// ═══════════════════ SEC 5 — CORRELATION ════════════════════
+new Chart(document.getElementById("corrChart"),{
+  type:"bar",
+  data:{
+    labels:["Temperature (°C)","Wet Bulb Temp (°C)","Latitude","Humidity (%)"],
+    datasets:[{
+      data:[0.489,0.484,-0.288,-0.040],
+      backgroundColor:["#b91c1ccc","#b91c1ccc","#2563a8cc","#52525bcc"],
+      borderColor:["#b91c1c","#b91c1c","#2563a8","#52525b"],
+      borderWidth:1, borderRadius:2,
+    }]
+  },
+  options:{
+    indexAxis:"y",
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:10,
+        callbacks:{label:ctx=>{const v=ctx.raw;return ` r = ${v>=0?"+":""}${v.toFixed(3)}`}}}
+    },
+    scales:{
+      x:{min:-0.35,max:0.6,grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>`r=${v>=0?"+":""}${v.toFixed(2)}`}},
+      y:{grid:{display:false},ticks:{font:{size:12},color:"#18181b"}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// ═══════════════════ SEC 5 — SCATTER PLOT ════════════════════
+const RMSE=0.030;
+const scatterSorted=[...ALL29].sort((a,b)=>a.pred-b.pred);
+
+new Chart(document.getElementById("scatterChart"),{
+  type:"scatter",
+  data:{datasets:[
+    { label:"Outperforming",
+      data:ALL29.filter(f=>f.blue).map(f=>({x:f.pred,y:f.act,...f})),
+      backgroundColor:"rgba(37,99,168,0.75)", borderColor:"#2563a8", borderWidth:1.5,
+      pointRadius:8, pointHoverRadius:10 },
+    { label:"Underperforming",
+      data:ALL29.filter(f=>!f.blue).map(f=>({x:f.pred,y:f.act,...f})),
+      backgroundColor:"rgba(192,57,43,0.75)", borderColor:"#c0392b", borderWidth:1.5,
+      pointRadius:8, pointHoverRadius:10 }
+  ]},
+  options:{
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+        callbacks:{
+          title:ctx=>ctx[0].raw.name,
+          label:ctx=>{const d=ctx.raw;const sign=d.diff>=0?"+":"";return[` Actual: ${d.act.toFixed(3)}`,` Predicted: ${d.pred.toFixed(3)}`,` Diff: ${sign}${d.diff.toFixed(1)}%`]}
+        }}
+    },
+    scales:{
+      x:{min:1.073,max:1.158,title:{display:true,text:"Model prediction — avg of Model C & D",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>v.toFixed(3)}},
+      y:{min:1.033,max:1.158,title:{display:true,text:"Actual 2025 PUE (Q1–Q4 average)",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>v.toFixed(3)}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// Scatter decorations (RMSE band, diagonal, point numbers)
+Chart.register({id:"scatterDeco",afterDraw(chart){
+  if(chart.canvas.id!=="scatterChart")return;
+  const ctx=chart.ctx; const xs=chart.scales.x; const ys=chart.scales.y; ctx.save();
+  // RMSE band
+  const lo=1.075, hi=1.155;
+  const x1=xs.getPixelForValue(lo+RMSE), x2=xs.getPixelForValue(hi);
+  const y1=ys.getPixelForValue(lo+RMSE), y2=ys.getPixelForValue(hi);
+  const bx1=xs.getPixelForValue(lo),     by1=ys.getPixelForValue(lo);
+  ctx.fillStyle="rgba(150,150,150,0.12)";
+  ctx.beginPath();
+  ctx.moveTo(xs.getPixelForValue(lo),ys.getPixelForValue(lo+RMSE));
+  ctx.lineTo(xs.getPixelForValue(hi-RMSE),ys.getPixelForValue(hi));
+  ctx.lineTo(xs.getPixelForValue(hi),ys.getPixelForValue(hi));
+  ctx.lineTo(xs.getPixelForValue(hi),ys.getPixelForValue(hi-RMSE));
+  ctx.lineTo(xs.getPixelForValue(lo+RMSE),ys.getPixelForValue(lo));
+  ctx.lineTo(xs.getPixelForValue(lo),ys.getPixelForValue(lo));
+  ctx.closePath(); ctx.fill();
+  // Band edges
+  [[lo,lo+RMSE,hi-RMSE,hi],[lo+RMSE,lo,hi,hi-RMSE]].forEach(([x1,y1,x2,y2])=>{
+    ctx.setLineDash([4,5]); ctx.strokeStyle="#bbb"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(xs.getPixelForValue(x1),ys.getPixelForValue(y1)); ctx.lineTo(xs.getPixelForValue(x2),ys.getPixelForValue(y2)); ctx.stroke();
+  });
+  // Perfect prediction line
+  ctx.setLineDash([7,5]); ctx.strokeStyle="#555"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(xs.getPixelForValue(lo),ys.getPixelForValue(lo)); ctx.lineTo(xs.getPixelForValue(hi),ys.getPixelForValue(hi)); ctx.stroke();
+  ctx.setLineDash([]);
+  // Number labels on points
+  ctx.font="bold 9px JetBrains Mono"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ALL29.forEach(f=>{
+    const px=xs.getPixelForValue(f.pred); const py=ys.getPixelForValue(f.act);
+    const col=f.blue?"#2563a8":"#c0392b";
+    ctx.fillStyle=col;
+    ctx.beginPath(); ctx.arc(px,py,8,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.fillText(f.id,px,py);
+  });
+  ctx.restore();
+}});
+
+// ═══════════════════ SEC 5 — GROWING PUE ════════════════════
+const gSorted=[...GROWING].sort((a,b)=>a.pue-b.pue);
+new Chart(document.getElementById("growingPueChart"),{
+  type:"bar",
+  data:{
+    labels:gSorted.map(m=>m.short),
+    datasets:[{
+      data:gSorted.map(m=>m.pue),
+      backgroundColor:gSorted.map(m=>TC[m.tier]+"cc"),
+      borderColor:gSorted.map(m=>TC[m.tier]),
+      borderWidth:1.5, borderRadius:3,
+    }]
+  },
+  options:{
+    indexAxis:"y",
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+        callbacks:{title:ctx=>gSorted[ctx[0].dataIndex].name,label:ctx=>{const m=gSorted[ctx[0].dataIndex];return[` Predicted PUE: ${m.pue.toFixed(3)} (${TIER_LBL[m.tier]})`,` ±0.030 RMSE · Google-level ops assumed`]}}}
+    },
+    scales:{
+      x:{min:1.08,max:1.15,grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>v.toFixed(3)}},
+      y:{grid:{display:false},ticks:{font:{size:12},color:"#18181b"}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// Reference lines for growing PUE
+Chart.register({id:"pueRefs",afterDraw(chart){
+  if(chart.canvas.id!=="growingPueChart")return;
+  const ctx=chart.ctx;
+  [{v:1.09,lbl:"Fleet avg 1.09",col:"rgba(27,58,107,0.55)"},{v:1.093,lbl:"Hamina FI (best)",col:"rgba(10,124,82,0.65)"}]
+  .forEach(({v,lbl,col},i)=>{
+    const x=chart.scales.x.getPixelForValue(v); ctx.save();
+    ctx.setLineDash([4,4]); ctx.strokeStyle=col; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x,chart.chartArea.top); ctx.lineTo(x,chart.chartArea.bottom); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle=col; ctx.font="9px JetBrains Mono";
+    ctx.fillText(lbl,x+4,chart.chartArea.top+14+(i*14)); ctx.restore();
+  });
+}});
+
+// ═══════════════════ SEC 7 — BUBBLE GROWING ════════════════════
+new Chart(document.getElementById("bubbleGrowing"),{
+  type:"bubble",
+  data:{datasets:[{
+    label:"Growing markets",
+    data:GROWING.map(m=>({x:m.co2,y:m.gapM,r:Math.max(7,Math.sqrt(m.coolM)*4.5),...m})),
+    backgroundColor:GROWING.map(m=>m.carbonP>0?"#b45309bb":"#b91c1cbb"),
+    borderColor:GROWING.map(m=>m.carbonP>0?"#b45309":"#b91c1c"),
+    borderWidth:1.5,
+  }]},
+  options:{
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+        callbacks:{
+          title:ctx=>ctx[0].raw.name,
+          label:ctx=>{const d=ctx.raw;return[` Predicted PUE: ${d.pue.toFixed(3)}`,` CO₂: ${d.co2.toLocaleString()} tons/yr`,` Underpays ETS by $${d.gapM.toFixed(2)}M/yr`,` Cooling: $${d.coolM.toFixed(1)}M/yr`,` Carbon price: $${d.carbonP}/ton`]}
+        }}
+    },
+    scales:{
+      x:{title:{display:true,text:"Annual CO₂ from cooling (tons/yr)",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>v>=1000?Math.round(v/1000)+"K":v}},
+      y:{min:0,title:{display:true,text:"Additional carbon cost vs EU ETS ($M/yr)",color:"#52525b",font:{size:12}},grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>`$${v.toFixed(1)}M`}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+// Growing bubble labels
+Chart.register({id:"growingBubbleLbl",afterDraw(chart){
+  if(chart.canvas.id!=="bubbleGrowing")return;
+  const ctx=chart.ctx; ctx.save(); ctx.font="bold 10px 'Source Sans 3',sans-serif"; ctx.fillStyle="#18181b"; ctx.textAlign="center";
+  chart.data.datasets[0].data.forEach((d,pi)=>{
+    const meta=chart.getDatasetMeta(0); if(!meta.visible)return;
+    const pt=meta.data[pi]; if(!pt)return;
+    ctx.fillText(d.short.replace(/[A-Z]{2}$/,"").trim(),pt.x,pt.y-(d.r||8)-4);
+  }); ctx.restore();
+}});
+
+// ═══════════════════ SEC 7 — ALL 20 BAR ════════════════════
+const ALL20=[
+  ...GOOGLE10.map(f=>({name:f.short,gapM:-f.gapM,src:"actual"})),
+  ...GROWING.map(m=>({name:m.short+" *",gapM:-m.gapM,src:"predicted"})),
+].sort((a,b)=>b.gapM-a.gapM);
+
+new Chart(document.getElementById("allGapChart"),{
+  type:"bar",
+  data:{
+    labels:ALL20.map(d=>d.name),
+    datasets:[{
+      data:ALL20.map(d=>d.gapM),
+      backgroundColor:ALL20.map(d=>{if(d.gapM>=0.3)return"#0a7c52cc";if(d.gapM>=-1)return"#52525bcc";if(d.gapM>=-3)return"#b45309cc";return"#b91c1ccc"}),
+      borderColor:ALL20.map(d=>{if(d.gapM>=0.3)return"#0a7c52";if(d.gapM>=-1)return"#52525b";if(d.gapM>=-3)return"#b45309";return"#b91c1c"}),
+      borderWidth:1, borderRadius:2,
+    }]
+  },
+  options:{
+    indexAxis:"y",
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+        callbacks:{label:ctx=>{const v=ctx.raw;return v>=0?` Overpays ETS by $${v.toFixed(2)}M/yr`:` Underpays ETS by $${Math.abs(v).toFixed(2)}M/yr`}}}
+    },
+    scales:{
+      x:{grid:gridOpts,ticks:{font:{family:"JetBrains Mono",size:10},callback:v=>`$${v>=0?"+":""}${v.toFixed(1)}M`}},
+      y:{grid:{display:false},ticks:{font:{size:11},color:"#18181b"}}
+    },
+    maintainAspectRatio:false,
+  }
+});
+
+Chart.register({id:"zeroAll",afterDraw(chart){
+  if(chart.canvas.id!=="allGapChart")return;
+  const x0=chart.scales.x.getPixelForValue(0); const ctx=chart.ctx; ctx.save();
+  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(27,58,107,0.4)"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x0,chart.chartArea.top); ctx.lineTo(x0,chart.chartArea.bottom); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.55)"; ctx.font="9px JetBrains Mono";
+  ctx.fillText("ETS breakeven",x0+4,chart.chartArea.top+14); ctx.restore();
+}});
+
+// ═══════════════════ MAPS ════════════════════════════════════
+function initMaps(){
+  const tile="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  const attr='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>';
+
+  // Map: Google facilities
+  const mg=L.map("mapGoogle",{scrollWheelZoom:false}).setView([30,10],2);
+  L.tileLayer(tile,{attribution:attr,subdomains:"abcd",maxZoom:14}).addTo(mg);
+
+  const maxCO2G=Math.max(...GOOGLE10.map(f=>f.co2));
+  GOOGLE10.forEach(f=>{
+    const r = 5 + (f.co2/maxCO2G)*15;
+    const col=gridColor(f.gridCO2);
+    const pueRows=Object.entries(f.pue).map(([yr,v])=>`<tr><td style="color:#9ca3af">${yr}</td><td style="color:${TC[tierOf(v)]};font-weight:700">${v.toFixed(3)}</td><td style="font-size:9px;color:#52525b;padding-left:6px">${TIER_LBL[tierOf(v)]}</td></tr>`).join("");
+    const gSign=f.gapM>=0?"underpays":"overpays";
+    const gCol=f.gapM>=0?"#b91c1c":"#0a7c52";
+    const popup=`<div class="popup-inner"><div class="popup-name">${f.name}</div>
+      <div class="popup-row"><span class="popup-key">Grid CO₂</span><span class="popup-val">${f.gridCO2} gCO₂/kWh</span></div>
+      <div class="popup-row"><span class="popup-key">Annual CO₂</span><span class="popup-val">${f.co2.toLocaleString()} tons</span></div>
+      <div class="popup-row"><span class="popup-key">Carbon policy</span><span class="popup-val" style="color:${gCol}">${gSign} $${Math.abs(f.gapM).toFixed(2)}M vs ETS</span></div>
+      ${f.coolM?`<div class="popup-row"><span class="popup-key">Cooling cost</span><span class="popup-val">$${f.coolM.toFixed(1)}M/yr</span></div>`:""}
+      <div style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-top:9px;margin-bottom:3px">PUE by year</div>
+      <table class="popup-pue-tbl">${pueRows}</table></div>`;
+    L.circleMarker([f.lat,f.lon],{radius:r,color:col,weight:1.5,fillColor:col,fillOpacity:0.6}).addTo(mg).bindPopup(popup,{maxWidth:270});
+  });
+
+  // Map: Growing markets
+  const mgr=L.map("mapGrowing",{scrollWheelZoom:false}).setView([20,105],3);
+  L.tileLayer(tile,{attribution:attr,subdomains:"abcd",maxZoom:14}).addTo(mgr);
+
+  const maxCO2Gr=Math.max(...GROWING.map(m=>m.co2));
+  GROWING.forEach(m=>{
+    const r=5+(m.co2/maxCO2Gr)*15;
+    const col=gridColor(m.gridCO2);
+    const popup=`<div class="popup-inner"><div class="popup-name">${m.name}</div>
+      <div class="popup-row"><span class="popup-key">Predicted PUE</span><span class="popup-val" style="color:${TC[m.tier]}">${m.pue.toFixed(3)} (${TIER_LBL[m.tier]})</span></div>
+      <div class="popup-row"><span class="popup-key">Grid CO₂</span><span class="popup-val">${m.gridCO2} gCO₂/kWh</span></div>
+      <div class="popup-row"><span class="popup-key">Annual CO₂</span><span class="popup-val">${m.co2.toLocaleString()} tons</span></div>
+      <div class="popup-row"><span class="popup-key">Cooling cost</span><span class="popup-val">$${m.coolM.toFixed(1)}M/yr</span></div>
+      <div class="popup-row"><span class="popup-key">Carbon gap vs ETS</span><span class="popup-val" style="color:#b91c1c">underpays $${m.gapM.toFixed(2)}M/yr</span></div>
+      <div class="popup-row"><span class="popup-key">Local carbon price</span><span class="popup-val">$${m.carbonP}/ton</span></div></div>`;
+    L.circleMarker([m.lat,m.lon],{radius:r,color:col,weight:1.5,fillColor:col,fillOpacity:0.6}).addTo(mgr).bindPopup(popup,{maxWidth:260});
+  });
+}
+
+// ═══════════════════ NAV ACTIVE ════════════════════
+function updateNav(){
+  const ids=["s1","s2","s3","s4","s5","s6","s7"];
+  const y=window.scrollY+80;
+  let active="s1";
+  ids.forEach(id=>{const el=document.getElementById(id);if(el&&el.offsetTop<=y)active=id;});
+  document.querySelectorAll(".nav-sec").forEach(el=>el.classList.toggle("active",el.getAttribute("href")==="#"+active));
+}
+window.addEventListener("scroll",updateNav,{passive:true});
+document.addEventListener("DOMContentLoaded",()=>{initMaps();updateNav();});
+</script>
+</body>
+</html>
