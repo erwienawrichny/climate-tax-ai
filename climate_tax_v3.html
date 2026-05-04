@@ -26,6 +26,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-he
 
 /* NAV */
 nav{background:var(--navy);position:sticky;top:0;z-index:500;height:56px;display:flex;align-items:center;padding:0 36px;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.nav-chapter-dropdown{position:relative;cursor:pointer;user-select:none;outline:none}
+.chapter-menu{display:none;position:absolute;top:calc(100% + 10px);left:0;background:#fff;border:1px solid var(--border);border-radius:5px;min-width:230px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:600;overflow:hidden}
+.nav-chapter-dropdown:focus .chapter-menu,.nav-chapter-dropdown.open .chapter-menu{display:block}
+.chapter-menu-item{padding:11px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--text-2);border-bottom:1px solid var(--border)}
+.chapter-menu-item:last-child{border-bottom:none}
+.chapter-menu-item.active{color:var(--navy);font-weight:700}
+.chapter-menu-item.coming{color:var(--text-3);font-style:italic}
 .nav-brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
 .nav-sub{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4)}
 .nav-title{font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff}
@@ -223,13 +230,34 @@ footer a{color:var(--text-2);text-decoration:none}
 footer a:hover{color:var(--navy)}
 
 @media(max-width:800px){
-  .wrap{padding:0 20px} nav{padding:0 20px}
+  .wrap{padding:0 20px}
+  nav{padding:0 16px;height:auto;min-height:56px;flex-wrap:wrap;gap:6px;padding-top:8px;padding-bottom:8px}
+  .nav-brand{flex:1 1 auto}
+  .nav-sections{display:none}
+  .nav-divider{display:none}
+  .nav-cta{font-size:9px;padding:5px 12px}
   .hero-inner{flex-direction:column;gap:28px}
   .hero-questions{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;width:100%}
   .pue-formula{grid-template-columns:1fr} .pue-op{display:none}
   .pue-chain{grid-template-columns:1fr 1fr} .chain-step::after{display:none}
   .tier-grid,.policy-grid,.reg-cards{grid-template-columns:1fr}
   .scatter-wrap{flex-direction:column} .scatter-index-panel{width:100%;max-height:300px}
+  .chart-card{padding:18px 16px}
+  .map-container{height:300px}
+  .reg-cards{gap:12px}
+  .section{padding:44px 0 36px}
+  .chapter-menu{min-width:200px}
+}
+@media(max-width:480px){
+  .pue-chain{grid-template-columns:1fr}
+  .tier-grid{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:34px}
+  .hero-cta{font-size:9px;padding:9px 16px}
+  .map-container{height:260px}
+  .scroll-chart-wrap{max-height:380px}
+  .scatter-index-panel{max-height:220px}
+  .model-tbl-wrap{font-size:11px}
+  .policy-head{font-size:15px}
 }
 </style>
 </head>
@@ -237,9 +265,13 @@ footer a:hover{color:var(--navy)}
 
 <!-- NAV -->
 <nav>
-  <div class="nav-brand">
-    <div class="nav-sub">Chapter 01 · Infrastructure Finance</div>
+  <div class="nav-brand nav-chapter-dropdown" tabindex="0">
+    <div class="nav-sub">Chapter 01 · Infrastructure Finance <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.5);border-radius:3px;margin-left:6px;font-size:12px;color:var(--substack);vertical-align:middle">▾</span></div>
     <div class="nav-title">The Climate Tax of AI</div>
+    <div class="chapter-menu">
+      <div class="chapter-menu-item active">Chapter 01 · Infrastructure Finance</div>
+      <div class="chapter-menu-item coming">Chapter 02 · Coming soon…</div>
+    </div>
   </div>
   <div class="nav-sections">
     <div class="nav-divider"></div>
@@ -250,9 +282,10 @@ footer a:hover{color:var(--navy)}
     <a class="nav-sec" href="#s5">5</a>
     <a class="nav-sec" href="#s6">6</a>
     <a class="nav-sec" href="#s7">7</a>
+    <a class="nav-sec" href="#s8">8</a>
     <div class="nav-divider"></div>
   </div>
-  <a href="YOUR_SUBSTACK_URL" target="_blank" class="nav-cta">Read Article →</a>
+  <a href="https://github.com/erwienawrichny" target="_blank" class="nav-cta">GitHub →</a>
 </nav>
 
 <!-- HERO -->
@@ -263,18 +296,20 @@ footer a:hover{color:var(--navy)}
         <div class="hero-eyebrow">Data Center Infrastructure · Carbon Analysis · Google 2025 Public Data</div>
         <h1>The Climate Tax<br>of <em>AI</em></h1>
         <p class="hero-desc">What Google's public facility-level PUE data reveals about the hidden environmental cost of hyperscale infrastructure — and what it would cost if we priced it honestly.</p>
-        <a href="YOUR_SUBSTACK_URL" target="_blank" class="hero-cta">Read full article →</a>
+        <a href="https://open.substack.com/pub/ewrichny/p/the-climate-tax-of-ai?r=wghlo&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true" target="_blank" class="hero-cta">Read Full Article on Substack →</a>
+        <p style="margin-top:14px;font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.45);line-height:1.8">Analysis by Erwiena Wrichny · <a href="https://www.linkedin.com/in/ewrichny/" target="_blank" style="color:rgba(255,255,255,.55);text-decoration:none">LinkedIn</a> · <a href="mailto:ewrichny@outlook.com" style="color:rgba(255,255,255,.55);text-decoration:none">Email</a></p>
       </div>
       <div class="hero-questions">
-        <div class="hq-label">Critical questions this analysis is trying to answer</div>
+        <div class="hq-label">Key Critical Questions:</div>
         <ul class="hq-list">
-          <li class="hq-item"><span class="hq-num">1</span><span class="hq-text"><a href="#s1">What is PUE and why does it matter for carbon?</a></span></li>
+          <li class="hq-item"><span class="hq-num">1</span><span class="hq-text"><a href="#s1">What is Power Usage Effectiveness (PUE) and why does it matter for carbon?</a></span></li>
           <li class="hq-item"><span class="hq-num">2</span><span class="hq-text"><a href="#s2">What does Google's PUE look like across facilities?</a></span></li>
           <li class="hq-item"><span class="hq-num">3</span><span class="hq-text"><a href="#s3">How much carbon does each Google facility emit from cooling?</a></span></li>
-          <li class="hq-item"><span class="hq-num">4</span><span class="hq-text"><a href="#s4">What is the gap between what facilities pay today vs. EU ETS?</a></span></li>
-          <li class="hq-item"><span class="hq-num">5</span><span class="hq-text"><a href="#s5">What PUE should a hyperscaler target in regions with growing data center demand?</a></span></li>
-          <li class="hq-item"><span class="hq-num">6</span><span class="hq-text"><a href="#s6">What are the estimated carbon emissions for each growing data center market?</a></span></li>
-          <li class="hq-item"><span class="hq-num">7</span><span class="hq-text"><a href="#s7">What is the gap between local carbon pricing and EU ETS for growing markets?</a></span></li>
+          <li class="hq-item"><span class="hq-num">4</span><span class="hq-text"><a href="#s4">What is the gap between what facilities pay today vs. EU Emissions Trading System (ETS)?</a></span></li>
+          <li class="hq-item"><span class="hq-num">5</span><span class="hq-text"><a href="#s5">How do we estimate what PUE a hyperscaler should target?</a></span></li>
+          <li class="hq-item"><span class="hq-num">6</span><span class="hq-text"><a href="#s6">What PUE should a hyperscaler target in regions with growing data center demand?</a></span></li>
+          <li class="hq-item"><span class="hq-num">7</span><span class="hq-text"><a href="#s7">What are the estimated carbon emissions for each growing data center market?</a></span></li>
+          <li class="hq-item"><span class="hq-num">8</span><span class="hq-text"><a href="#s8">What is the gap between local carbon pricing and EU ETS for growing markets?</a></span></li>
         </ul>
       </div>
     </div>
@@ -287,8 +322,8 @@ footer a:hover{color:var(--navy)}
 <div class="section" id="s1">
   <div class="sec-num">1</div>
   <div class="sec-eye"><span>Section 1 · Fundamentals</span></div>
-  <h2>What is PUE and why does it matter for carbon?</h2>
-  <p class="sec-lead">Power Usage Effectiveness is the single most important public metric for data center energy efficiency. It tells you how much of a facility's electricity actually reaches the servers — and how much is lost to overhead. That overhead has a direct, calculable carbon cost determined almost entirely by location.</p>
+  <h2>What is Power Usage Effectiveness (PUE) and why does it matter for carbon?</h2>
+  <p class="sec-lead">PUE is one of the most important public metrics for data center energy efficiency. It tells you how much of a facility's electricity actually goes to computing and how much is lost to overhead. The majority of that overhead goes to cooling, and that overhead has a direct, calculable carbon cost driven by three things: climate, the cleanliness of the energy supply, and government carbon policy.</p>
 
   <div class="pue-formula">
     <div class="pue-box">
@@ -337,25 +372,26 @@ footer a:hover{color:var(--navy)}
   </div>
 
   <div class="analysis-block">
-    <p>Google is the only major hyperscaler that publishes quarterly, facility-level PUE data — 30 facilities, updated every quarter, publicly available at <strong>datacenters.google/efficiency</strong>. AWS reports a single global average. Microsoft reports regionally. Google gives you the facility name, the quarter, and the number. That transparency is what makes this analysis possible. Using Google's 2025 data across 10 selected facilities, and a consistent assumption of a <strong>100MW IT load</strong> hyperscale campus, this analysis estimates three things for each location: the annual cost of cooling electricity, the CO₂ produced by that cooling, and the carbon cost gap — how much more each facility would owe if carbon were priced at the EU ETS standard of <strong>$70.37 per ton</strong>. What the numbers show is that the gap is real, large, and almost entirely explained by two things: how dirty the local grid is, and how close to zero the local carbon price is. The two cheapest places to build — Riyadh and Jakarta — also carry the largest unpriced carbon bills. Low electricity cost doesn't mean clean infrastructure. It means the true cost is being absorbed somewhere else.</p>
+    <p>Google is the only major hyperscaler that publishes quarterly, facility-level PUE data — 30 facilities, updated every quarter. In 2024, Google reported a global average PUE of 1.09, representing 40% less cooling overhead than AWS (1.15) and 44% less than Microsoft (1.16). AWS reports a single global average. Microsoft reports regionally. That transparency gap matters.</p>
+    <p style="margin-top:14px">Using Google's 2025 data across 10 selected facilities, and a consistent assumption of a <strong>100MW IT load</strong> hyperscale campus, this analysis estimates three things for each location: the annual cost of cooling electricity, the CO₂ produced by that cooling, and the carbon cost gap — how much more each facility would owe if carbon were priced at the EU ETS standard of <strong>$70.37 per ton</strong> versus what the local government currently charges. What the numbers show is that the gap is real, large, and almost entirely explained by two things: how dirty the local grid is, and how close to zero the local carbon price is. The two cheapest places to build — Riyadh and Jakarta — also carry the largest unpriced carbon bills. Low electricity cost doesn't mean clean infrastructure. It means the true cost is being absorbed somewhere else.</p>
   </div>
 
   <div class="policy-title">Three policy asks</div>
   <div class="policy-grid">
     <div class="policy-card">
       <div class="policy-n">Ask 1</div>
-      <div class="policy-head">Disclose</div>
-      <div class="policy-txt">Require facility-level PUE and carbon reporting as a condition of operating. Google does this voluntarily. AWS and Microsoft don't — not because it's technically hard, but because no one requires it. You can't hold companies accountable for what they don't have to report.</div>
+      <div class="policy-head">Require data centers to publish facility-level PUE and carbon disclosure.</div>
+      <div class="policy-txt">Require data centers to publish facility-level PUE and carbon disclosure as a condition of operating. This entire analysis exists because Google publishes quarterly PUE data for every facility. Governments approving large data center builds — especially in Southeast Asia and the Middle East — should make this a requirement. You can't hold companies accountable for what they don't have to report.</div>
     </div>
     <div class="policy-card">
       <div class="policy-n">Ask 2</div>
-      <div class="policy-head">Price it</div>
-      <div class="policy-txt">Extend carbon pricing to electricity markets where hyperscale investment is landing. The EU ETS works because it makes emissions show up in electricity prices — data centers feel it. Most fast-growing markets have no equivalent. Companies can build in carbon-heavy regions at zero carbon cost.</div>
+      <div class="policy-head">Price carbon where it actually matters.</div>
+      <div class="policy-txt">The EU Emissions Trading System works because it makes emissions show up in the cost of electricity. Power plants pay. That cost flows through. Large users like data centers feel it. The problem is that most fast-growing data center markets don't have anything similar — which means companies can build in carbon-heavy regions without paying for the emissions that come with it.</div>
     </div>
     <div class="policy-card">
       <div class="policy-n">Ask 3</div>
-      <div class="policy-head">CBAM it</div>
-      <div class="policy-txt">Extend CBAM principles to digital services. A Jakarta facility serving European AI users is doing exactly what CBAM was designed to prevent — producing in a near-zero carbon-price jurisdiction, consuming in a high-price one. Even partial adoption would push companies to disclose more and build smarter.</div>
+      <div class="policy-head">Extend CBAM principles to digital infrastructure.</div>
+      <div class="policy-txt">The Carbon Border Adjustment Mechanism already does this for physical goods. If steel is produced in a low-carbon-price country and sold in Europe, the importer pays the difference. That same logic applies to compute. Right now, a data center in a low-carbon-price region can serve users in high-carbon-price markets with no adjustment. Extending CBAM to digital services is complex, but even partial adoption would push companies to disclose more, build more efficiently, and think twice about treating low-carbon-price regions as a hidden subsidy.</div>
     </div>
   </div>
 </div>
@@ -365,7 +401,7 @@ footer a:hover{color:var(--navy)}
   <div class="sec-num">2</div>
   <div class="sec-eye"><span>Section 2 · Google PUE Trends</span></div>
   <h2>What does Google's PUE look like across facilities?</h2>
-  <p class="sec-lead">Google publishes quarterly PUE for all 30 facilities — a standard no other hyperscaler matches. The chart below shows all 29 reporting facilities sorted by 2025 average PUE. Every facility has improved year over year. Color reflects the efficiency tier.</p>
+  <p class="sec-lead">The chart below shows all 29 reporting facilities sorted by 2025 average PUE. Every facility has improved year over year. Color reflects the efficiency tier.</p>
 
   <div class="chart-card">
     <div class="chart-title">Annual Avg PUE — All 29 Google Facilities (2022–2025)</div>
@@ -390,7 +426,7 @@ footer a:hover{color:var(--navy)}
   <div class="sec-num">3</div>
   <div class="sec-eye"><span>Section 3 · Carbon Emissions Map</span></div>
   <h2>How much carbon does each Google facility emit from cooling?</h2>
-  <p class="sec-lead">Annual CO₂ from cooling overhead at a standard 100MW IT load. Marker color reflects the grid carbon intensity of that location — the cleanliness of the electricity supply. Marker size scales with annual CO₂ output. Click any marker for full detail including PUE by year.</p>
+  <p class="sec-lead">Annual CO₂ from cooling overhead at a standard 100MW IT load — a typical IT load for a hyperscale campus. Marker color reflects the grid carbon intensity of that location, or the cleanliness of the electricity supply. Marker size scales with annual CO₂ output. Click any marker for full detail including PUE by year.</p>
 
   <div class="map-wrap">
     <div class="map-header">
@@ -412,8 +448,8 @@ footer a:hover{color:var(--navy)}
 <div class="section" id="s4">
   <div class="sec-num">4</div>
   <div class="sec-eye"><span>Section 4 · Carbon Policy Gap</span></div>
-  <h2>What is the gap between what facilities pay today vs. what EU ETS would charge?</h2>
-  <p class="sec-lead">X axis: annual CO₂ from cooling. Y axis: carbon cost gap vs EU ETS ($70.37/ton). Positive = underpaying. Negative = overpaying (carbon policy working). Bubble size = annual cooling electricity cost. US facilities shown as diamonds — no national electricity pricing available.</p>
+  <h2>What is the gap between what facilities pay today vs. what EU Emissions Trading System (ETS) would charge?</h2>
+  <p class="sec-lead">Since the EU Emissions Trading System is the most widely used benchmark for a credible carbon price, we use the current market price of $70.37 per ton of CO₂ as our benchmark — though that number is still below the true social cost of carbon, which economists estimate at $185 to $283 per ton. X axis: annual CO₂ from cooling. Y axis: carbon cost gap vs EU ETS. Positive = underpaying. Negative = overpaying (carbon policy working). Bubble size = annual cooling electricity cost, which shows the financial scale of each facility's cooling operation — a larger bubble means a higher energy spend, letting you see which facilities face the largest carbon gaps in both relative and absolute dollar terms. US facilities shown as diamonds — no national electricity pricing available.</p>
 
   <div class="chart-card">
     <div class="chart-title">Carbon Policy Gap — 10 Google Facilities vs EU ETS $70.37/ton</div>
@@ -432,40 +468,8 @@ footer a:hover{color:var(--navy)}
 <div class="section" id="s5">
   <div class="sec-num">5</div>
   <div class="sec-eye"><span>Section 5 · Regression Model</span></div>
-  <h2>What PUE should a hyperscaler target in regions with growing data center demand?</h2>
-  <p class="sec-lead">A regression model built on Google's 30-facility dataset isolates how much of PUE is driven purely by climate — the efficiency floor set by geography before engineering starts. Two models were selected and averaged. This gives a fair, location-specific benchmark before a dollar of CapEx is committed.</p>
-
-  <div class="reg-cards">
-    <div class="reg-card">
-      <div class="reg-badge">Model C ★ Selected · Best CV R²</div>
-      <div class="reg-title">Wet Bulb Temperature + Latitude</div>
-      <div class="reg-eq">PUE = 1.0854<br>+ (0.00196 × wet_bulb °C)<br>+ (−0.000208 × latitude)</div>
-      <div class="reg-stats">
-        <div><span class="reg-sv">0.252</span><span class="reg-sl">CV R²</span></div>
-        <div><span class="reg-sv">1.6</span><span class="reg-sl">VIF</span></div>
-        <div><span class="reg-sv">&lt;0.001</span><span class="reg-sl">p-value</span></div>
-      </div>
-    </div>
-    <div class="reg-card">
-      <div class="reg-badge">Model D ★ Selected · Best AIC</div>
-      <div class="reg-title">Avg Temperature + Latitude</div>
-      <div class="reg-eq">PUE = 1.0804<br>+ (0.00185 × avg_temp °C)<br>+ (−0.000215 × latitude)</div>
-      <div class="reg-stats">
-        <div><span class="reg-sv">0.254</span><span class="reg-sl">CV R²</span></div>
-        <div><span class="reg-sv">1.9</span><span class="reg-sl">VIF</span></div>
-        <div><span class="reg-sv">−1771.8</span><span class="reg-sl">AIC</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="r2-block">
-    <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3)">What explains PUE variation? (N=426 quarterly observations, 30 facilities)</div>
-    <div class="r2-bar-wrap">
-      <div class="r2-climate" style="width:25%"><span class="r2-lbl" style="color:#fff;font-size:11px">~25% climate</span></div>
-      <div class="r2-ops"><span class="r2-lbl" style="color:var(--text-2);font-size:11px">~75% engineering + operations</span></div>
-    </div>
-    <p style="font-size:13px;color:var(--text-2);line-height:1.7">Climate explains ~25% of PUE variation across Google's fleet. The remaining 75% belongs to the companies: cooling system design, hardware generation, AI-assisted energy optimization, facility age, and operational discipline. The model prediction error is <strong>±0.030 PUE units</strong> — enough to benchmark a location, not precise enough to engineer against.</p>
-  </div>
+  <h2>How do we estimate what PUE a hyperscaler should target?</h2>
+  <p class="sec-lead">A regression model built on Google's 30-facility dataset isolates how much of PUE is driven purely by climate — the efficiency floor set by geography before engineering starts. Two models were selected and averaged. This gives a fair, location-specific benchmark. Here are the four variables tested, the output of each model, and the error rate.</p>
 
   <!-- CORRELATION CHART -->
   <div class="chart-card">
@@ -526,6 +530,54 @@ footer a:hover{color:var(--navy)}
     </div>
   </div>
 
+  <div class="reg-cards">
+    <div class="reg-card">
+      <div class="reg-badge">Model C ★ Selected · Best CV R²</div>
+      <div class="reg-title">Wet Bulb Temperature + Latitude</div>
+      <div class="reg-eq">PUE = 1.0854<br>+ (0.00196 × wet_bulb °C)<br>+ (−0.000208 × latitude)</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">0.252</span><span class="reg-sl">CV R²</span></div>
+        <div><span class="reg-sv">1.6</span><span class="reg-sl">VIF</span></div>
+        <div><span class="reg-sv">&lt;0.001</span><span class="reg-sl">p-value</span></div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-badge">Model D ★ Selected · Best AIC</div>
+      <div class="reg-title">Avg Temperature + Latitude</div>
+      <div class="reg-eq">PUE = 1.0804<br>+ (0.00185 × avg_temp °C)<br>+ (−0.000215 × latitude)</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">0.254</span><span class="reg-sl">CV R²</span></div>
+        <div><span class="reg-sv">1.9</span><span class="reg-sl">VIF</span></div>
+        <div><span class="reg-sv">−1771.8</span><span class="reg-sl">AIC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="r2-block">
+    <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-3)">What explains PUE variation? (N=426 quarterly observations, 30 facilities)</div>
+    <div class="r2-bar-wrap">
+      <div class="r2-climate" style="width:25%"><span class="r2-lbl" style="color:#fff;font-size:11px">~25% climate</span></div>
+      <div class="r2-ops"><span class="r2-lbl" style="color:var(--text-2);font-size:11px">~75% engineering + operations</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);line-height:1.7">Climate explains ~25% of PUE variation across Google's fleet. The remaining 75% belongs to the companies: cooling system design, hardware generation, AI-assisted energy optimization, facility age, and operational discipline. The model prediction error is <strong>±0.030 PUE units</strong> — enough to benchmark a location, not precise enough to engineer against.</p>
+  </div>
+
+</div>
+
+<!-- ══════════ SECTION 6 ══════════ -->
+<div class="section" id="s6">
+  <div class="sec-num">6</div>
+  <div class="sec-eye"><span>Section 6 · Growing Markets</span></div>
+  <h2>What PUE should a hyperscaler target in regions with growing data center demand?</h2>
+  <p class="sec-lead">The markets analyzed here represent the next wave of hyperscale investment: Seoul, Tokyo, Taipei, and Singapore in Asia-Pacific; Mumbai, Jakarta, Kuala Lumpur, and Bangkok in South and Southeast Asia; and Riyadh and Dubai in the Middle East. These markets are growing for three intersecting reasons: government-led digital economy initiatives, rapid AI adoption by local enterprises, and hyperscaler expansion driven by low electricity costs. That last driver is also what makes the carbon story important — low electricity cost often signals fossil-heavy generation, not efficiency.</p>
+
+  <!-- PREDICTED PUE GROWING MARKETS -->
+  <div class="chart-card">
+    <div class="chart-title">Predicted PUE — 10 Growing Markets (Model C+D Average)</div>
+    <div class="chart-sub">Sorted by predicted PUE · Assumes Google-level operational excellence · ±0.030 RMSE</div>
+    <div style="position:relative;height:300px"><canvas id="growingPueChart"></canvas></div>
+  </div>
+
   <!-- SCATTER PLOT — ACTUAL VS PREDICTED -->
   <div class="chart-card">
     <div class="chart-title">Actual vs Predicted PUE — All 29 Google Facilities (2025)</div>
@@ -553,31 +605,14 @@ footer a:hover{color:var(--navy)}
       </div>
     </div>
   </div>
-
-  <!-- PREDICTED PUE GROWING MARKETS -->
-  <div class="chart-card">
-    <div class="chart-title">Predicted PUE — 10 Growing Markets (Model C+D Average)</div>
-    <div class="chart-sub">Sorted by predicted PUE · Assumes Google-level operational excellence · ±0.030 RMSE</div>
-    <div style="position:relative;height:300px"><canvas id="growingPueChart"></canvas></div>
-  </div>
-
-  <div class="chart-card">
-    <div class="chart-title">Growing Market PUE Predictions — Full Table</div>
-    <div class="chart-sub">Avg of Model C and D · Climate inputs from Open-Meteo 2024 annual averages · 100MW IT load assumed</div>
-    <div class="tbl-wrap">
-      <table class="dt"><thead><tr>
-        <th>Market</th><th class="r">Predicted PUE</th><th class="r">Grid CO₂ (g/kWh)</th><th class="r">Annual CO₂ (tons)</th><th class="r">Cooling Cost</th><th class="r">Carbon Gap vs ETS</th>
-      </tr></thead><tbody id="growingTableBody"></tbody></table>
-    </div>
-  </div>
 </div>
 
-<!-- ══════════ SECTION 6 ══════════ -->
-<div class="section" id="s6">
-  <div class="sec-num">6</div>
-  <div class="sec-eye"><span>Section 6 · Growing Markets Emissions</span></div>
+<!-- ══════════ SECTION 7 ══════════ -->
+<div class="section" id="s7">
+  <div class="sec-num">7</div>
+  <div class="sec-eye"><span>Section 7 · Growing Markets Emissions</span></div>
   <h2>What are the estimated carbon emissions for each growing data center market?</h2>
-  <p class="sec-lead">The next wave of hyperscale investment. Predicted PUE at Google-level operational excellence. Every single market carries a carbon gap measured in millions of dollars per 100MW facility per year. The cheapest markets to build in also carry the largest unpriced carbon costs.</p>
+  <p class="sec-lead">Every single market carries a carbon gap measured in millions of dollars per 100MW facility per year — assuming the hyperscaler operates at Google-level efficiency. The cheapest markets to build in, Indonesia and India, also carry the largest unpriced carbon costs.</p>
 
   <div class="map-wrap">
     <div class="map-header">
@@ -595,12 +630,12 @@ footer a:hover{color:var(--navy)}
   </div>
 </div>
 
-<!-- ══════════ SECTION 7 ══════════ -->
-<div class="section" id="s7">
-  <div class="sec-num">7</div>
-  <div class="sec-eye"><span>Section 7 · Growing Markets Policy Gap</span></div>
+<!-- ══════════ SECTION 8 ══════════ -->
+<div class="section" id="s8">
+  <div class="sec-num">8</div>
+  <div class="sec-eye"><span>Section 8 · Growing Markets Policy Gap</span></div>
   <h2>What is the gap between local carbon pricing and EU ETS for growing data center markets?</h2>
-  <p class="sec-lead">Same framework as section 4, applied to the 10 growing markets. Every market sits above the zero line — every one is underpaying relative to EU ETS. Low electricity prices don't signal clean infrastructure. They signal the true cost of energy is being absorbed somewhere else.</p>
+  <p class="sec-lead">Applying the same framework as section 4 to the 10 growing markets. Every market sits above the zero line — every one is underpaying relative to EU ETS. Low electricity prices don't signal clean infrastructure. They signal the true cost of energy is being absorbed somewhere else.</p>
 
   <div class="chart-card">
     <div class="chart-title">Carbon Policy Gap — 10 Growing Markets vs EU ETS $70.37/ton</div>
@@ -618,6 +653,16 @@ footer a:hover{color:var(--navy)}
     <div style="position:relative;height:480px"><canvas id="allGapChart"></canvas></div>
     <div class="footnote">* Predicted PUE for growing markets using the average of Model C (Wet Bulb + Latitude) and Model D (Avg Temp + Latitude). Assumes Google-level operational excellence as the efficiency floor. Actual PUE will depend on facility design, hardware, and operational decisions — the remaining ~75% of PUE variation not explained by climate.</div>
   </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Growing Market PUE Predictions — Full Table</div>
+    <div class="chart-sub">Avg of Model C and D · Climate inputs from Open-Meteo 2024 annual averages · 100MW IT load assumed</div>
+    <div class="tbl-wrap">
+      <table class="dt"><thead><tr>
+        <th>Market</th><th class="r">Predicted PUE</th><th class="r">Grid CO₂ (g/kWh)</th><th class="r">Annual CO₂ (tons)</th><th class="r">Cooling Cost</th><th class="r">Carbon Gap vs ETS</th>
+      </tr></thead><tbody id="growingTableBody2"></tbody></table>
+    </div>
+  </div>
 </div>
 
 </div><!-- /wrap -->
@@ -627,7 +672,7 @@ footer a:hover{color:var(--navy)}
     Dataset: Google Data Center Efficiency Page (30 facilities, 2022–2025) · Open-Meteo Historical Climate API<br>
     World Bank Carbon Pricing Dashboard · IEA / Ember Grid Intensity (2024) · GlobalPetrolPrices<br>
     Methodology: OLS Linear Regression · 5-fold Cross-Validation · N=426 quarterly observations<br><br>
-    Analysis by <a href="YOUR_SUBSTACK_URL">Erwiena</a> · <a href="https://github.com/YOUR_GITHUB" target="_blank">GitHub</a>
+    Analysis by Erwiena Wrichny · <a href="https://www.linkedin.com/in/ewrichny/" target="_blank">LinkedIn</a> · <a href="mailto:ewrichny@outlook.com">Email</a>
   </div>
 </footer>
 
@@ -706,18 +751,23 @@ const GROWING = [
 GROWING.forEach(m => { m.gapM = m.co2*(EU_ETS - m.carbonP)/1e6 });
 
 // ═══════════════════ GROWING TABLE ════════════════════════════
-const gtb = document.getElementById("growingTableBody");
-[...GROWING].sort((a,b)=>a.pue-b.pue).forEach(m=>{
-  const t=m.tier;
-  gtb.innerHTML+=`<tr>
-    <td><span class="dot" style="background:${TC[t]}"></span><strong>${m.name}</strong></td>
-    <td class="r">${m.pue.toFixed(3)} <span class="pill-sm ${TIER_PILL[t]}">${TIER_LBL[t]}</span></td>
-    <td class="r">${m.gridCO2}</td>
-    <td class="r">${m.co2.toLocaleString()}</td>
-    <td class="r">$${m.coolM.toFixed(1)}M</td>
-    <td class="r"><span class="vneg">−$${m.gapM.toFixed(2)}M</span></td>
-  </tr>`;
-});
+function renderGrowingTable(tbodyId){
+  const gtb = document.getElementById(tbodyId);
+  if(!gtb) return;
+  [...GROWING].sort((a,b)=>a.pue-b.pue).forEach(m=>{
+    const t=m.tier;
+    gtb.innerHTML+=`<tr>
+      <td><span class="dot" style="background:${TC[t]}"></span><strong>${m.name}</strong></td>
+      <td class="r">${m.pue.toFixed(3)} <span class="pill-sm ${TIER_PILL[t]}">${TIER_LBL[t]}</span></td>
+      <td class="r">${m.gridCO2}</td>
+      <td class="r">${m.co2.toLocaleString()}</td>
+      <td class="r">$${m.coolM.toFixed(1)}M</td>
+      <td class="r"><span class="vneg">−$${m.gapM.toFixed(2)}M</span></td>
+    </tr>`;
+  });
+}
+renderGrowingTable("growingTableBody");
+renderGrowingTable("growingTableBody2");
 
 // ═══════════════════ SCATTER INDEX ════════════════════════════
 const idxEl = document.getElementById("scatterIndex");
@@ -1121,6 +1171,14 @@ function updateNav(){
 }
 window.addEventListener("scroll",updateNav,{passive:true});
 document.addEventListener("DOMContentLoaded",()=>{initMaps();updateNav();});
+
+// ═══════════════════ CHAPTER DROPDOWN ════════════════════════
+const chapterDrop = document.querySelector('.nav-chapter-dropdown');
+chapterDrop.addEventListener('click', e => {
+  e.stopPropagation();
+  chapterDrop.classList.toggle('open');
+});
+document.addEventListener('click', () => chapterDrop.classList.remove('open'));
 </script>
 </body>
 </html>
