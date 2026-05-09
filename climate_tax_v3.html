@@ -224,6 +224,17 @@ table.dt tr:hover td{background:var(--bg)}
 .popup-pue-tbl td{padding:3px 4px;font-family:var(--font-mono);font-size:10.5px}
 .popup-pue-tbl td:last-child{text-align:right;font-weight:600}
 
+/* HOME SECTION */
+.home-section{padding:56px 0 48px;border-bottom:1px solid var(--border)}
+.home-inner{display:flex;align-items:center;gap:36px}
+.home-avatar{flex-shrink:0;width:96px;height:96px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:28px;font-weight:700;color:#fff;overflow:hidden;border:3px solid var(--border)}
+.home-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.home-text p{font-size:15px;color:var(--text-2);line-height:1.85;max-width:680px;margin-bottom:16px}
+.home-links{display:flex;gap:12px;flex-wrap:wrap}
+.home-link{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);text-decoration:none;padding:5px 12px;border:1px solid var(--border);border-radius:3px;transition:all .15s}
+.home-link:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media(max-width:800px){.home-inner{flex-direction:column;align-items:flex-start;gap:20px}}
+
 /* FOOTER */
 footer{padding:44px 0;text-align:center;color:var(--text-3);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;line-height:2.2;border-top:1px solid var(--border)}
 footer a{color:var(--text-2);text-decoration:none}
@@ -269,6 +280,7 @@ footer a:hover{color:var(--navy)}
     <div class="nav-sub">Chapter 01 · Infrastructure Finance <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.5);border-radius:3px;margin-left:6px;font-size:12px;color:var(--substack);vertical-align:middle">▾</span></div>
     <div class="nav-title">The Climate Tax of AI</div>
     <div class="chapter-menu">
+      <a href="home.html" class="chapter-menu-item" style="text-decoration:none;display:block">Home</a>
       <div class="chapter-menu-item active">Chapter 01 · Infrastructure Finance</div>
       <div class="chapter-menu-item coming">Chapter 02 · Coming soon…</div>
     </div>
@@ -1163,9 +1175,9 @@ function initMaps(){
 
 // ═══════════════════ NAV ACTIVE ════════════════════
 function updateNav(){
-  const ids=["s1","s2","s3","s4","s5","s6","s7"];
+  const ids=["home","s1","s2","s3","s4","s5","s6","s7","s8"];
   const y=window.scrollY+80;
-  let active="s1";
+  let active="home";
   ids.forEach(id=>{const el=document.getElementById(id);if(el&&el.offsetTop<=y)active=id;});
   document.querySelectorAll(".nav-sec").forEach(el=>el.classList.toggle("active",el.getAttribute("href")==="#"+active));
 }

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erwiena Wrichny</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f7f5f0; --white:#fff; --text:#18181b; --text-2:#52525b; --text-3:#a1a1aa;
+  --border:#e4e0d8; --navy:#1b3a6b; --substack:#ff6719;
+  --c-green:#0a7c52;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --font-sans:'Source Sans 3',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.65;min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+nav{background:var(--navy);position:sticky;top:0;z-index:500;height:56px;display:flex;align-items:center;padding:0 36px;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.nav-chapter-dropdown{position:relative;cursor:pointer;user-select:none;outline:none}
+.chapter-menu{display:none;position:absolute;top:calc(100% + 10px);left:0;background:#fff;border:1px solid var(--border);border-radius:5px;min-width:230px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:600;overflow:hidden}
+.nav-chapter-dropdown:focus .chapter-menu,.nav-chapter-dropdown.open .chapter-menu{display:block}
+.chapter-menu-item{padding:11px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--text-2);border-bottom:1px solid var(--border);display:block;text-decoration:none}
+.chapter-menu-item:last-child{border-bottom:none}
+.chapter-menu-item.active{color:var(--navy);font-weight:700}
+.chapter-menu-item.coming{color:var(--text-3);font-style:italic}
+.nav-brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.nav-sub{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.nav-title{font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff}
+.nav-cta{background:var(--substack);color:#fff;text-decoration:none;padding:6px 16px;border-radius:3px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;transition:opacity .15s;flex-shrink:0}
+.nav-cta:hover{opacity:.88}
+
+/* LAYOUT */
+.wrap{max-width:1080px;margin:0 auto;padding:0 36px}
+
+/* HOME CONTENT */
+.home-hero{background:var(--navy);padding:72px 0 64px;flex:1}
+.home-inner{display:flex;align-items:center;gap:48px}
+.home-avatar{flex-shrink:0;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:36px;font-weight:700;color:#fff;overflow:hidden;border:2px solid rgba(255,255,255,.2)}
+.home-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.home-name{font-family:var(--font-serif);font-size:clamp(28px,4vw,44px);font-weight:700;color:#fff;margin-bottom:6px}
+.home-role{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:20px}
+.home-bio{font-size:15px;color:rgba(255,255,255,.7);max-width:580px;line-height:1.85;margin-bottom:24px}
+.home-links{display:flex;gap:10px;flex-wrap:wrap}
+.home-link{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,.3);border-radius:3px;transition:all .15s}
+.home-link:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.6)}
+
+/* PROJECTS */
+.projects{padding:56px 0}
+.projects-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-3);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.projects-label::before{content:'';display:block;width:20px;height:1.5px;background:var(--c-green)}
+.project-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:28px;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;text-decoration:none;transition:box-shadow .15s}
+.project-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.project-title{font-family:var(--font-serif);font-size:22px;color:var(--text);margin-bottom:8px}
+.project-desc{font-size:14px;color:var(--text-2);line-height:1.75;max-width:600px}
+.project-arrow{font-family:var(--font-mono);font-size:20px;color:var(--text-3);flex-shrink:0;margin-top:4px}
+
+/* FOOTER */
+footer{padding:32px 0;text-align:center;color:var(--text-3);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;line-height:2.2;border-top:1px solid var(--border)}
+
+@media(max-width:800px){
+  nav{padding:0 16px}
+  .wrap{padding:0 20px}
+  .home-inner{flex-direction:column;align-items:flex-start;gap:24px}
+  .home-hero{padding:48px 0 40px}
+  .project-card{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand nav-chapter-dropdown" tabindex="0">
+    <div class="nav-sub">Home <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.5);border-radius:3px;margin-left:6px;font-size:12px;color:var(--substack);vertical-align:middle">▾</span></div>
+    <div class="nav-title">Erwiena Wrichny</div>
+    <div class="chapter-menu">
+      <div class="chapter-menu-item active">Home</div>
+      <a href="climate_tax_v3.html" class="chapter-menu-item">Chapter 01 · Infrastructure Finance</a>
+      <div class="chapter-menu-item coming">Chapter 02 · Coming soon…</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME HERO -->
+<div class="home-hero">
+  <div class="wrap">
+    <div class="home-inner">
+      <div class="home-avatar">
+        <!-- To add your photo: replace "EW" below with <img src="your-photo.jpg" alt="Erwiena Wrichny"> -->
+        EW
+      </div>
+      <div>
+        <div class="home-name">Erwiena Wrichny</div>
+        <p class="home-bio">Hi! I have a background in finance and a curiosity that usually ends up in a spreadsheet. I'm a UW Seattle grad with a double major in Finance and Operations Management. This is where I poke at publicly available data on topics that catch my interest — I hope something here catches yours too.</p>
+        <div class="home-links">
+          <a class="home-link" href="https://www.linkedin.com/in/ewrichny/" target="_blank">LinkedIn</a>
+          <a class="home-link" href="mailto:ewrichny@outlook.com">Email</a>
+          <a class="home-link" href="https://open.substack.com/pub/ewrichny/p/the-climate-tax-of-ai?r=wghlo&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true" target="_blank">Substack</a>
+          <a class="home-link" href="https://github.com/erwienawrichny" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="projects">
+  <div class="wrap">
+    <div class="projects-label"><span>Projects</span></div>
+    <a href="climate_tax_v3.html" class="project-card">
+      <div>
+        <div class="project-title">The Climate Tax of AI</div>
+        <p class="project-desc">What Google's public facility-level PUE data reveals about the hidden environmental cost of hyperscale infrastructure — and what it would cost if we priced it honestly.</p>
+      </div>
+      <div class="project-arrow">→</div>
+    </a>
+  </div>
+</div>
+
+<footer>© Erwiena Wrichny</footer>
+
+<script>
+const dd = document.querySelector(".nav-chapter-dropdown");
+dd.addEventListener("click", e => { dd.classList.toggle("open"); e.stopPropagation(); });
+document.addEventListener("click", () => dd.classList.remove("open"));
+</script>
+</body>
+</html>
