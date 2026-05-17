@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nature Makes the Wine — Bordeaux Analysis · Erwiena Wrichny</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#f7f5f0; --white:#fff; --text:#18181b; --text-2:#52525b; --text-3:#a1a1aa;
+  --border:#e4e0d8; --wine:#6b1a2a; --substack:#ff6719;
+  --c-green:#0a7c52; --c-green-bg:#ecfdf5;
+  --c-gray:#52525b;  --c-gray-bg:#f4f4f5;
+  --c-amber:#b45309; --c-amber-bg:#fef3c7;
+  --c-red:#b91c1c;   --c-red-bg:#fee2e2;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --font-sans:'Source Sans 3',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.65}
+
+/* NAV */
+nav{background:var(--wine);position:sticky;top:0;z-index:500;height:56px;display:flex;align-items:center;padding:0 36px;justify-content:space-between;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.nav-chapter-dropdown{position:relative;cursor:pointer;user-select:none;outline:none}
+.chapter-menu{display:none;position:absolute;top:calc(100% + 10px);left:0;background:#fff;border:1px solid var(--border);border-radius:5px;min-width:230px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:600;overflow:hidden}
+.nav-chapter-dropdown:focus .chapter-menu,.nav-chapter-dropdown.open .chapter-menu{display:block}
+.chapter-menu-item{padding:11px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--text-2);border-bottom:1px solid var(--border)}
+.chapter-menu-item:last-child{border-bottom:none}
+.chapter-menu-item.active{color:var(--wine);font-weight:700}
+.chapter-menu-item.coming{color:var(--text-3);font-style:italic}
+.nav-brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.nav-sub{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.nav-title{font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff}
+.nav-sections{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.nav-sec{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-decoration:none;transition:all .15s;border:1px solid transparent}
+.nav-sec:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-sec.active{color:#fff;border-color:rgba(107,26,42,.7);background:rgba(107,26,42,.35)}
+.nav-cta{background:var(--substack);color:#fff;text-decoration:none;padding:6px 16px;border-radius:3px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;transition:opacity .15s;flex-shrink:0}
+.nav-cta:hover{opacity:.88}
+.nav-divider{width:1px;height:28px;background:rgba(255,255,255,.15);margin:0 12px}
+
+/* LAYOUT */
+.wrap{max-width:1080px;margin:0 auto;padding:0 36px}
+
+/* HERO */
+.hero{background:var(--wine);padding:56px 0 48px}
+.hero-inner{display:flex;align-items:flex-start;gap:64px}
+.hero-text{flex:1}
+.hero-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px}
+.hero h1{font-family:var(--font-serif);font-size:clamp(38px,5vw,60px);line-height:1.06;color:#fff;margin-bottom:14px}
+.hero h1 em{color:rgba(255,255,255,.6);font-style:italic}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.6);max-width:460px;line-height:1.75;margin-bottom:24px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--c-green);color:#fff;text-decoration:none;padding:11px 22px;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-radius:3px;transition:opacity .15s}
+.hero-cta:hover{opacity:.88}
+.hero-questions{flex:0 0 360px;border-left:1px solid rgba(255,255,255,.15);padding-left:36px}
+.hq-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px}
+.hq-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.hq-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.hq-item:last-child{border-bottom:none}
+.hq-num{font-family:var(--font-mono);font-size:10px;font-weight:600;color:rgba(255,255,255,.3);min-width:18px;margin-top:2px}
+.hq-text{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5}
+.hq-text a{color:rgba(255,255,255,.7);text-decoration:none}
+.hq-text a:hover{color:#fff}
+
+/* SECTIONS */
+.section{padding:68px 0 60px;border-bottom:1px solid var(--border);position:relative}
+.section:last-child{border-bottom:none}
+.sec-num{position:absolute;top:44px;right:-8px;font-family:var(--font-serif);font-size:160px;font-weight:900;color:rgba(107,26,42,.04);line-height:1;pointer-events:none;user-select:none}
+.sec-eye{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sec-eye::before{content:'';display:block;width:20px;height:1.5px;background:var(--wine)}
+.sec-eye span{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+h2{font-family:var(--font-serif);font-size:clamp(22px,2.8vw,32px);color:var(--text);margin-bottom:12px;line-height:1.2}
+.sec-lead{font-size:15px;color:var(--text-2);max-width:700px;line-height:1.8;margin-bottom:36px}
+
+/* STEP CHAIN */
+.pue-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.chain-step{background:var(--white);border:1px solid var(--border);border-radius:5px;padding:18px 16px;position:relative}
+.chain-step::after{content:'→';position:absolute;right:-18px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-3);z-index:1}
+.chain-step:last-child::after{display:none}
+.chain-n{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--wine);margin-bottom:6px}
+.chain-txt{font-size:12px;color:var(--text-2);line-height:1.55}
+
+/* STAT TILES */
+.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:36px}
+.tier-c{border-radius:5px;padding:14px 16px;border-left:3px solid}
+.tier-c.g{background:var(--c-green-bg);border-color:var(--c-green)} .tier-c.g .tier-c-n{color:var(--c-green)}
+.tier-c.gr{background:var(--c-gray-bg);border-color:var(--c-gray)}  .tier-c.gr .tier-c-n{color:var(--c-gray)}
+.tier-c.a{background:var(--c-amber-bg);border-color:var(--c-amber)} .tier-c.a .tier-c-n{color:var(--c-amber)}
+.tier-c.r{background:var(--c-red-bg);border-color:var(--c-red)}    .tier-c.r .tier-c-n{color:var(--c-red)}
+.tier-c.w{background:#fdf2f4;border-color:var(--wine)}              .tier-c.w .tier-c-n{color:var(--wine)}
+.tier-c-lbl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+.tier-c-n{font-family:var(--font-mono);font-size:18px;font-weight:700}
+.tier-c-txt{font-size:12px;color:var(--text-2);margin-top:5px;line-height:1.5}
+
+/* ANALYSIS BLOCK */
+.analysis-block{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:28px 32px;margin-bottom:28px}
+.analysis-block p{font-size:14.5px;color:var(--text-2);line-height:1.85}
+.analysis-block strong{color:var(--text)}
+
+/* CALLOUT */
+.callout{border-left:3px solid var(--wine);background:#fdf2f4;border-radius:0 6px 6px 0;padding:16px 20px;margin-bottom:20px;font-size:14px;color:var(--text-2);line-height:1.8}
+.callout strong{color:var(--text)}
+.callout.green{border-color:var(--c-green);background:var(--c-green-bg)}
+.callout.amber{border-color:var(--c-amber);background:var(--c-amber-bg)}
+
+/* POLICY CARDS */
+.policy-title{font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:18px}
+.policy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.policy-card{background:var(--white);border:1px solid var(--border);border-radius:5px;padding:22px 20px;border-top:3px solid var(--wine)}
+.policy-n{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+.policy-head{font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--wine);margin-bottom:8px}
+.policy-txt{font-size:13px;color:var(--text-2);line-height:1.65}
+
+/* CHART CARD */
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:28px 30px;margin-bottom:20px}
+.chart-title{font-family:var(--font-serif);font-size:18px;color:var(--text)}
+.chart-sub{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;color:var(--text-3);margin-top:3px;margin-bottom:20px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:18px}
+.leg-item{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;color:var(--text-2)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-line{width:20px;height:0;border-top:2px dashed;flex-shrink:0}
+.leg-ring{width:10px;height:10px;border-radius:50%;border:2px solid;flex-shrink:0}
+
+/* REGRESSION CARDS */
+.reg-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.reg-card{background:var(--wine);border-radius:6px;padding:26px 28px;color:#fff}
+.reg-badge{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px}
+.reg-title{font-family:var(--font-serif);font-size:16px;color:#fff;margin-bottom:14px}
+.reg-eq{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.08);padding:12px 14px;border-radius:4px;color:rgba(255,255,255,.9);line-height:1.9;margin-bottom:12px}
+.reg-stats{display:flex;gap:20px}
+.reg-sv{font-family:var(--font-mono);font-size:14px;font-weight:600;color:#fff;display:block}
+.reg-sl{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:2px;display:block}
+
+/* R² BAR */
+.r2-block{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:22px 28px;margin-bottom:20px}
+.r2-bar-wrap{background:var(--bg);border-radius:4px;height:26px;overflow:hidden;position:relative;margin:12px 0 8px}
+.r2-fill{height:100%;background:var(--wine);display:flex;align-items:center;padding-right:10px;justify-content:flex-end}
+.r2-rest{position:absolute;right:0;top:0;height:100%;background:var(--border);display:flex;align-items:center;padding-left:10px}
+.r2-lbl{font-family:var(--font-mono);font-size:10px;font-weight:600}
+
+/* MODEL TABLE */
+.model-tbl-wrap table{width:100%;border-collapse:collapse;font-size:12.5px}
+.model-tbl-wrap th{font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);text-align:center;padding:8px 10px;border-bottom:2px solid var(--border);border-right:1px solid var(--border)}
+.model-tbl-wrap th:first-child{text-align:left}
+.model-tbl-wrap th:last-child{border-right:none}
+.model-tbl-wrap td{padding:9px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;vertical-align:top;line-height:1.4}
+.model-tbl-wrap td:first-child{text-align:left;font-weight:700}
+.model-tbl-wrap td:last-child{border-right:none;font-size:11.5px;color:var(--text-2);text-align:left}
+.model-tbl-wrap tr:last-child td{border-bottom:none}
+.model-tbl-wrap tr.sel-row td{background:#fdf2f4}
+.model-section-hdr td{background:var(--wine)!important;color:#fff!important;font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:left!important;padding:8px 12px;border:none!important}
+.sel-badge{display:inline-block;background:var(--wine);color:#fff;font-family:var(--font-mono);font-size:8px;padding:2px 6px;border-radius:2px;letter-spacing:.08em;margin-left:4px}
+.sig-badge{display:inline-block;padding:2px 7px;border-radius:3px;font-family:var(--font-mono);font-size:9px;font-weight:700}
+.sig-3{background:var(--c-green-bg);color:var(--c-green)}
+.sig-1{background:var(--c-amber-bg);color:var(--c-amber)}
+.sig-ns{background:var(--c-gray-bg);color:var(--c-gray)}
+.coef-pos{color:var(--c-green);font-weight:700}
+.coef-neg{color:var(--c-red);font-weight:700}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:13px}
+table.dt th{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);text-align:left;padding:9px 12px;border-bottom:2px solid var(--border);white-space:nowrap}
+table.dt td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:var(--bg)}
+.vpos{color:var(--c-green);font-family:var(--font-mono);font-size:12px;font-weight:600}
+.vneg{color:var(--c-red);font-family:var(--font-mono);font-size:12px;font-weight:600}
+.footnote{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:12px;line-height:1.7}
+
+/* FOOTER */
+footer{padding:44px 0;text-align:center;color:var(--text-3);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;line-height:2.2;border-top:1px solid var(--border)}
+footer a{color:var(--text-2);text-decoration:none}
+footer a:hover{color:var(--wine)}
+
+@media(max-width:800px){
+  .wrap{padding:0 20px}
+  nav{padding:0 16px;height:auto;min-height:56px;flex-wrap:wrap;gap:6px;padding-top:8px;padding-bottom:8px}
+  .nav-brand{flex:1 1 auto}
+  .nav-sections{display:none}
+  .nav-divider{display:none}
+  .pue-chain{grid-template-columns:1fr 1fr} .chain-step::after{display:none}
+  .tier-grid,.policy-grid,.reg-cards{grid-template-columns:1fr}
+  .chart-card{padding:18px 16px}
+  .section{padding:44px 0 36px}
+  .chapter-menu{min-width:200px}
+  .hero-inner{flex-direction:column;gap:28px}
+  .hero-questions{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;width:100%}
+}
+@media(max-width:480px){
+  .pue-chain{grid-template-columns:1fr}
+  .tier-grid{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:34px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand nav-chapter-dropdown" tabindex="0">
+    <div class="nav-sub">Chapter 02 · Bordeaux Wine Analysis <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid rgba(255,255,255,.5);border-radius:3px;margin-left:6px;font-size:12px;color:var(--substack);vertical-align:middle">▾</span></div>
+    <div class="nav-title">Nature Makes the Wine</div>
+    <div class="chapter-menu">
+      <a href="home.html" class="chapter-menu-item" style="text-decoration:none;display:block">Home</a>
+      <a href="climate_tax_v3.html" class="chapter-menu-item" style="text-decoration:none;display:block">Chapter 01 · Infrastructure Finance</a>
+      <div class="chapter-menu-item active">Chapter 02 · Bordeaux Wine Analysis</div>
+    </div>
+  </div>
+  <div class="nav-sections">
+    <div class="nav-divider"></div>
+    <a class="nav-sec" href="#s1">1</a>
+    <a class="nav-sec" href="#s2">2</a>
+    <a class="nav-sec" href="#s3">3</a>
+    <a class="nav-sec" href="#s4">4</a>
+    <a class="nav-sec" href="#s5">5</a>
+    <a class="nav-sec" href="#s6">6</a>
+    <a class="nav-sec" href="#s7">7</a>
+    <a class="nav-sec" href="#s8">8</a>
+    <div class="nav-divider"></div>
+  </div>
+  <a href="https://open.substack.com/pub/ewrichny/" target="_blank" class="nav-cta">Substack →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Bordeaux Left Bank · Three Regression Models · 25 Châteaux · 1982–2024</div>
+        <h1>Nature Makes the Wine.<br>Humans Make the <em>Price.</em></h1>
+        <p class="hero-desc">What 43 years of Bordeaux weather data, 14,000 critic reviews, and five centuries of wine classification reveal about the gap between quality and what collectors actually pay.</p>
+        <a href="https://open.substack.com/pub/ewrichny/" target="_blank" class="hero-cta">Read Full Article on Substack →</a>
+        <p style="margin-top:14px;font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.45);line-height:1.8">Analysis by Erwiena Wrichny · <a href="https://www.linkedin.com/in/ewrichny/" target="_blank" style="color:rgba(255,255,255,.55);text-decoration:none">LinkedIn</a> · <a href="mailto:ewrichny@outlook.com" style="color:rgba(255,255,255,.55);text-decoration:none">Email</a></p>
+      </div>
+      <div class="hero-questions">
+        <div class="hq-label">Key Critical Questions:</div>
+        <ul class="hq-list">
+          <li class="hq-item"><span class="hq-num">1</span><span class="hq-text"><a href="#s1">Can weather alone predict whether a Bordeaux vintage will be great?</a></span></li>
+          <li class="hq-item"><span class="hq-num">2</span><span class="hq-text"><a href="#s2">How accurately does the model predict vintage scores — and where does it fail?</a></span></li>
+          <li class="hq-item"><span class="hq-num">3</span><span class="hq-text"><a href="#s3">Does a 170-year-old classification system still predict château quality today?</a></span></li>
+          <li class="hq-item"><span class="hq-num">4</span><span class="hq-text"><a href="#s4">How much of château-level score variation can we actually explain?</a></span></li>
+          <li class="hq-item"><span class="hq-num">5</span><span class="hq-text"><a href="#s5">Which châteaux consistently outperform — and underperform — their classification?</a></span></li>
+          <li class="hq-item"><span class="hq-num">6</span><span class="hq-text"><a href="#s6">Does biodynamic farming produce measurably better scores and higher prices?</a></span></li>
+          <li class="hq-item"><span class="hq-num">7</span><span class="hq-text"><a href="#s7">What actually drives en primeur prices — quality or prestige?</a></span></li>
+          <li class="hq-item"><span class="hq-num">8</span><span class="hq-text"><a href="#s8">Which châteaux are mispriced relative to their quality?</a></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════ SECTION 1 ══════════ -->
+<div class="section" id="s1">
+  <div class="sec-num">1</div>
+  <div class="sec-eye"><span>Section 1 · Model 1 — Weather → Vintage Score</span></div>
+  <h2>Can weather alone predict whether a Bordeaux vintage will be great?</h2>
+  <p class="sec-lead">Bordeaux wines are released as <em>en primeur</em> futures — buyers pay 100% upfront for unfinished barrel wine, 18–24 months before delivery, based on early critic barrel sample scores. The price is set after critics taste. The score is set by weather. Princeton economist Orley Ashenfelter proved in 1988 that three weather variables predict Bordeaux vintage quality better than any expert. Parker called him a "total sham." History proved Ashenfelter right.</p>
+
+  <div class="pue-chain">
+    <div class="chain-step">
+      <div class="chain-n">Variable 1 · Avg Temp (Apr–Sep)</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">+1.85 pts</strong> per +1°C growing season temperature. Warmer summers concentrate sugars and phenolics — the dominant positive driver in the model.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">Variable 2 · Harvest Rain (Aug–Sep)</div>
+      <div class="chain-txt"><strong style="color:var(--c-red)">−1.19 pts</strong> per +10mm of harvest rainfall. Rain dilutes fruit and risks botrytis rot — the single biggest negative driver.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">Variable 3 · Winter Rain (Oct–Mar)</div>
+      <div class="chain-txt"><strong style="color:var(--c-green)">+0.83 pts</strong> per +10mm of winter rainfall. Deep soil water reserves that vines draw on through the growing season — positive but secondary.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">2025 Forecast</div>
+      <div class="chain-txt">18.9°C growing season · 22mm harvest rain (2nd driest in 40 years). Model predicts <strong style="color:var(--wine)">95.9 pts</strong> (95% CI: 89–102). Critics are saying 97–100.</div>
+    </div>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-c g"><div class="tier-c-lbl">Train R²</div><div class="tier-c-n">72.5%</div><div class="tier-c-txt">In-sample fit across 43 vintages, 1982–2024.</div></div>
+    <div class="tier-c gr"><div class="tier-c-lbl">CV R²</div><div class="tier-c-n">48.8%</div><div class="tier-c-txt">5-fold cross-validation. Weather is a signal, not a crystal ball.</div></div>
+    <div class="tier-c a"><div class="tier-c-lbl">MAE</div><div class="tier-c-n">±2.17 pts</div><div class="tier-c-txt">Average points off per vintage. Accurate enough for direction, not precision.</div></div>
+    <div class="tier-c w"><div class="tier-c-lbl">N · Vintages</div><div class="tier-c-n">43</div><div class="tier-c-txt">1982–2024 Bordeaux Left Bank growing seasons.</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Model 1 · Left Bank Vintage Score: Actual vs Predicted (1982–2024)</div>
+    <div class="chart-sub">Solid line = actual score · Dashed = model prediction · Bars = harvest rainfall (right axis) · N=43 vintages</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#6b1a2a"></div> Actual Score</div>
+      <div class="leg-item"><div class="leg-line" style="border-color:#2563a8"></div> Predicted Score</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(107,26,42,0.25)"></div> Harvest Rain (mm)</div>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="chart1"></canvas></div>
+  </div>
+
+  <div class="analysis-block">
+    <p>The CV R² gap (72.5% in-sample vs 48.8% out-of-sample) is meaningful but expected. Weather predicts vintage quality <strong>directionally</strong> but not precisely. The model is best understood as a signal, not an oracle. Extreme years — the 1991 spring frost that destroyed 40% of buds, the 2003 European heatwave that ran 5°C above normal — fall outside what a linear weather model can capture.</p>
+    <p style="margin-top:14px">The 2025 gap tells its own story. The model predicts 95.9 pts. Critics are saying 97–100 for top châteaux. That 2–4pt gap between model and critic is where prestige and hype live. <strong>Nature sets the ceiling. Humans decide how close to reach it — and what story to tell on the way up.</strong></p>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 2 ══════════ -->
+<div class="section" id="s2">
+  <div class="sec-num">2</div>
+  <div class="sec-eye"><span>Section 2 · Model 1 — Coefficients &amp; Fit</span></div>
+  <h2>How accurately does the model predict vintage scores — and where does it fail?</h2>
+  <p class="sec-lead">The regression isolates three independent signals. All three are statistically significant at p&lt;0.001. Growing season temperature is the dominant positive driver. Harvest rainfall is the biggest drag. Winter rainfall provides the deep-soil water reserve vines draw on through summer.</p>
+
+  <div class="model-tbl-wrap tbl-wrap" style="margin-bottom:24px">
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th><th>Coefficient</th><th>Std Error</th><th>p-value</th><th>Significance</th><th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family:var(--font-mono)">const</td>
+          <td style="text-align:center">42.4</td><td style="text-align:center">7.8</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td>
+          <td>Baseline score at zero weather inputs</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">temp_apr_sep (°C)</td>
+          <td style="text-align:center" class="coef-pos">+1.85</td><td style="text-align:center">0.32</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td>
+          <td>+1°C growing season → +1.85 pts</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">harvest_rain (mm)</td>
+          <td style="text-align:center" class="coef-neg">−0.119</td><td style="text-align:center">0.028</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td>
+          <td>+10mm harvest rain → −1.19 pts</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">winter_rain (mm)</td>
+          <td style="text-align:center" class="coef-pos">+0.083</td><td style="text-align:center">0.022</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td>
+          <td>+10mm winter rain → +0.83 pts</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Model 1 · Growing Season Temperature vs Actual Vintage Score</div>
+    <div class="chart-sub">Each point = one vintage · Point size proportional to harvest rainfall — larger = more rain = harder year · N=43 vintages (1982–2024)</div>
+    <div style="position:relative;height:280px"><canvas id="chart2"></canvas></div>
+  </div>
+
+  <div class="analysis-block">
+    <p>The model fails in two systematic ways. First, extreme weather events fall outside the range of normal variation it was trained on — 1991's spring frost that eliminated 40% of buds shows up as a massive underestimate; 2003's European heatwave pushed temperatures so far beyond historical norms that the linear model loses its grip. Second, the model predicts one score for the entire Left Bank, ignoring appellation-level microclimate variation between Pauillac, St-Julien, Margaux, St-Estèphe, and Pessac-Léognan.</p>
+    <p style="margin-top:14px"><strong>Ashenfelter's insight:</strong> The wine establishment mocked a Princeton economist for saying weather predicts wine quality better than expert palates. He published anyway. Twenty years of results proved him right. His framework is now used in climate research to project how rising temperatures will shift Bordeaux vintage quality by 2050.</p>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 3 ══════════ -->
+<div class="section" id="s3">
+  <div class="sec-num">3</div>
+  <div class="sec-eye"><span>Section 3 · The 1855 Classification</span></div>
+  <h2>Does a 170-year-old classification system still predict château quality today?</h2>
+  <p class="sec-lead">Weather can predict average Left Bank vintage quality, but each château has its own terroir, winemaking philosophy, and accumulated reputation — none of which weather captures. The closest measurable proxy from public data is the 1855 Classification — a list Napoleon III's government created to showcase French wines at the Universal Exhibition in Paris. The brokers didn't taste anything. They looked at which châteaux commanded the highest prices over the previous decades.</p>
+
+  <div class="analysis-block">
+    <p>I'll be honest — I was skeptical. Using a ranking created in 1855 by brokers who never tasted the wine feels like a joke. But when I added it to the model, R² jumped from 29.8% to 68.2%. It's outdated, politically frozen, and widely criticised by wine experts. And it still works. The most likely reason: <strong>prestige compounds over 170 years.</strong> Being a First Growth in 1855 meant higher prices, more investment, better winemaking — which made you a better First Growth in 1900, and 1950, and today. The classification doesn't measure quality. It measures accumulated advantage.</p>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Classification Premiums vs 3rd Growth (Reference Category)</div>
+    <div class="chart-sub">Model 2 OLS coefficients · 3rd Growth = 0 (reference category) · Grey = not statistically significant (p=0.42)</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c-green)"></div> Significant positive (p&lt;0.001)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c-red)"></div> Significant negative (p&lt;0.001)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c-gray)"></div> Not significant (p=0.42)</div>
+    </div>
+    <div style="position:relative;height:240px"><canvas id="chart3"></canvas></div>
+  </div>
+
+  <div class="callout">
+    <strong>The 5th Growth finding:</strong> Fifth Growths score essentially the same as Third Growths — the coefficient is −0.18pts, with p=0.42. Statistically indistinguishable from zero. A classification gap that's real in price doesn't show up in quality. Collectors are paying for the tier, not the wine in the bottle.
+  </div>
+
+  <div class="reg-cards">
+    <div class="reg-card">
+      <div class="reg-badge">What the classification predicts</div>
+      <div class="reg-title">Classification Still Works — But Not How You'd Expect</div>
+      <div class="reg-eq">1st Growth: +3.40 pts vs 3rd (p&lt;0.001)<br>2nd Growth: +2.30 pts vs 3rd (p&lt;0.001)<br>4th Growth: −1.67 pts vs 3rd (p&lt;0.001)<br>5th Growth: −0.18 pts vs 3rd (p=0.42 ✗)</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">R² +38%</span><span class="reg-sl">Jump when added</span></div>
+        <div><span class="reg-sv">170 yrs</span><span class="reg-sl">Since 1855</span></div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-badge">The Mouton Rothschild exception</div>
+      <div class="reg-title">The Only Change in 170 Years</div>
+      <div class="reg-eq">1973: Mouton Rothschild promoted<br>from 2nd Growth → 1st Growth<br>After 20-year lobbying campaign<br>by Baron Philippe de Rothschild</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">1 change</span><span class="reg-sl">In 170 years</span></div>
+        <div><span class="reg-sv">20 yrs</span><span class="reg-sl">Of lobbying</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 4 ══════════ -->
+<div class="section" id="s4">
+  <div class="sec-num">4</div>
+  <div class="sec-eye"><span>Section 4 · Model 2 — Vintage + Classification → Château Score</span></div>
+  <h2>How much of château-level score variation can we actually explain?</h2>
+  <p class="sec-lead">Model 2 uses the vintage score from Model 1 — which already captures weather — plus the 1855 Classification dummies. Third Growth is the reference category. Biodynamic farming is deliberately excluded here; it's a management decision that belongs in the price model, not the score model. All VIFs are clean (max 1.73), confirming no multicollinearity.</p>
+
+  <div class="pue-chain">
+    <div class="chain-step">
+      <div class="chain-n">Train R²</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">68.1%</strong> — In-sample. Weather + classification explains two-thirds of all château score variation.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">CV R²</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">67.6%</strong> — 5-fold cross-validation. Only 0.5% train/CV gap. No overfitting.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">MAE</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">±1.25 pts</strong> — Average prediction error. Within normal critic score variation for the same wine.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">N · Observations</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">528</strong> — 25 châteaux across 2000–2024, sourced from IEEE BordeauxWines + Wine-Searcher.</div>
+    </div>
+  </div>
+
+  <div class="model-tbl-wrap tbl-wrap" style="margin-bottom:24px">
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th><th>Coef</th><th>Std Err</th><th>p-value</th><th>Sig</th><th>VIF</th><th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family:var(--font-mono)">const</td>
+          <td style="text-align:center">45.7</td><td style="text-align:center">2.13</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">—</td>
+          <td>Baseline (3rd Growth, average vintage year)</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">vintage_score</td>
+          <td style="text-align:center" class="coef-pos">+0.506</td><td style="text-align:center">0.023</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">1.0</td>
+          <td>+1pt vintage → +0.51pt château score</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_1 (1st Growth)</td>
+          <td style="text-align:center" class="coef-pos">+3.40</td><td style="text-align:center">0.249</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">1.5</td>
+          <td>+3.4pts above 3rd Growth average</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_2 (2nd Growth)</td>
+          <td style="text-align:center" class="coef-pos">+2.30</td><td style="text-align:center">0.216</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">1.73</td>
+          <td>+2.3pts above 3rd Growth average</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_4 (4th Growth)</td>
+          <td style="text-align:center" class="coef-neg">−1.67</td><td style="text-align:center">0.230</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">1.62</td>
+          <td>−1.7pts below 3rd Growth average</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_5 (5th Growth)</td>
+          <td style="text-align:center">−0.18</td><td style="text-align:center">0.218</td><td style="text-align:center">0.420</td>
+          <td style="text-align:center"><span class="sig-badge sig-ns">ns</span></td><td style="text-align:center">1.72</td>
+          <td>Not significant — same quality as 3rd Growth</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote">*** p&lt;0.001 · ns = not significant · VIF &gt;5 = multicollinearity concern · All VIFs clean (max 1.73) · 3rd Growth is reference category</p>
+
+  <div class="chart-card" style="margin-top:20px">
+    <div class="chart-title">Château Average Scores by Classification · Coloured by Appellation</div>
+    <div class="chart-sub">Each dot = one château, avg score 2000–2024 · Bubble size = avg model residual magnitude · N=25 châteaux</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>Margaux</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2980b9"></div>Pauillac</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#27ae60"></div>St-Julien</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8e44ad"></div>St-Estèphe</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#e67e22"></div>Pessac-Léognan</div>
+    </div>
+    <div style="position:relative;height:300px"><canvas id="chart4"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 5 ══════════ -->
+<div class="section" id="s5">
+  <div class="sec-num">5</div>
+  <div class="sec-eye"><span>Section 5 · Over &amp; Underperformers</span></div>
+  <h2>Which châteaux consistently outperform — and underperform — their classification?</h2>
+  <p class="sec-lead">Model 2 predicts what a château <em>should</em> score given the vintage quality and its 1855 tier. The residual — actual minus predicted — tells you which châteaux consistently beat expectations and which consistently disappoint. These are multi-year averages across 2000–2024, so they reflect genuine structural differences, not single-vintage noise.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Over &amp; Underperformers — Model 2 Residuals (Avg 2000–2024)</div>
+    <div class="chart-sub">Positive = scores above weather + classification prediction · Negative = below · ★ = more than 1pt from zero · N=25 châteaux</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c-green)"></div> Overperforming (+residual)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--c-red)"></div> Underperforming (−residual)</div>
+    </div>
+    <div style="position:relative;height:480px"><canvas id="chart5"></canvas></div>
+  </div>
+
+  <div class="policy-title">The stories behind the numbers</div>
+  <div class="policy-grid">
+    <div class="policy-card">
+      <div class="policy-n">Overperformer ★</div>
+      <div class="policy-head">Palmer +1.68 pts</div>
+      <div class="policy-txt">A Third Growth that performs like a First. Classified in 1855, Palmer suffered from lack of investment at the time — critics believe it would have ranked Second Growth had its potential been recognised. Since Thomas Duroux became winemaker in 2004, it has scored on par with Château Margaux. The +1.68 residual persists across 25 years. It's not noise.</div>
+    </div>
+    <div class="policy-card">
+      <div class="policy-n">Overperformer ★</div>
+      <div class="policy-head">Pontet-Canet +1.50 pts</div>
+      <div class="policy-txt">The first fully certified biodynamic château in the Médoc. After transitioning in 2010, Pontet-Canet went from reliable Fifth Growth to occasionally matching the First Growths. Parker gave the 2010 vintage 100 points. The market now prices it like a Second Growth despite its Fifth Growth classification.</div>
+    </div>
+    <div class="policy-card">
+      <div class="policy-n">Overperformer ★</div>
+      <div class="policy-head">Lynch-Bages +1.10 pts</div>
+      <div class="policy-txt">A Fifth Growth that has quietly scored like a Third for two decades. No biodynamic certification, no obvious structural explanation — just consistently excellent winemaking under the Cazes family. The classification hasn't caught up with the quality.</div>
+    </div>
+  </div>
+
+  <div class="analysis-block">
+    <p><strong>The underperformers:</strong> d'Armailhac (−1.62 pts ★) and Lagrange (−1.32 pts ★) both consistently underperform their classification peers. Less critical attention, less brand investment, and the scores reflect it. These are multi-year averages — the signal is structural, not noise.</p>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 6 ══════════ -->
+<div class="section" id="s6">
+  <div class="sec-num">6</div>
+  <div class="sec-eye"><span>Section 6 · Biodynamic Farming</span></div>
+  <h2>Does biodynamic farming produce measurably better scores and higher prices?</h2>
+  <p class="sec-lead">Biodynamic farming treats the vineyard as a self-contained ecosystem — no synthetic pesticides or fertilisers, composting, cover crops, and farming timed to lunar cycles. It goes further than organic. We added a biodynamic dummy to Model 3 (the price model) — coded 1 for Pontet-Canet from 2010 and Palmer from 2017, when each received formal certification.</p>
+
+  <div class="tier-grid">
+    <div class="tier-c g"><div class="tier-c-lbl">Price Premium</div><div class="tier-c-n">+27.6%</div><div class="tier-c-txt">Biodynamic certification adds 27.6% to bottle price, independent of the score itself.</div></div>
+    <div class="tier-c a"><div class="tier-c-lbl">p-value</div><div class="tier-c-n">0.044</div><div class="tier-c-txt">Statistically significant at p&lt;0.05. Limited to two châteaux — interpret carefully.</div></div>
+    <div class="tier-c gr"><div class="tier-c-lbl">Bio Observations</div><div class="tier-c-n">23</div><div class="tier-c-txt">Pontet-Canet (2010–2024) + Palmer (2017–2024) certified vintages.</div></div>
+    <div class="tier-c w"><div class="tier-c-lbl">Score Jump</div><div class="tier-c-n">+0.7 pts</div><div class="tier-c-txt">Pontet-Canet avg score before vs after biodynamic. Tiny score move, doubled price.</div></div>
+  </div>
+
+  <div class="reg-cards">
+    <div class="reg-card">
+      <div class="reg-badge">Pontet-Canet · 5th Growth · Pauillac</div>
+      <div class="reg-title">The Biodynamic Price Story</div>
+      <div class="reg-eq">Before (2000–2009):<br>Avg score 92.9pts · Residual +1.39<br><br>After (2010–2024):<br>Avg score 93.6pts · Residual +1.50<br>Market price roughly doubled</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">+0.7 pts</span><span class="reg-sl">Score improvement</span></div>
+        <div><span class="reg-sv">~2× price</span><span class="reg-sl">Market re-rating</span></div>
+      </div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-badge">Palmer · 3rd Growth · Margaux</div>
+      <div class="reg-title">The Palmer Exception</div>
+      <div class="reg-eq">Palmer went biodynamic in 2017 —<br>but had already outperformed its<br>classification for years before that.<br>The +1.68pt residual persists<br>whether we control for bio or not.</div>
+      <div class="reg-stats">
+        <div><span class="reg-sv">+1.68 pts</span><span class="reg-sl">Residual (25yr avg)</span></div>
+        <div><span class="reg-sv">Pre-2017</span><span class="reg-sl">Already exceptional</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The honest interpretation:</strong> Biodynamic certification adds ~28% to price, independent of the score itself. Whether that reflects genuine quality improvement or market willingness to pay for the certification story is harder to separate. The Pontet-Canet data suggests it's mostly the story — score barely moved, price doubled.
+  </div>
+</div>
+
+<!-- ══════════ SECTION 7 ══════════ -->
+<div class="section" id="s7">
+  <div class="sec-num">7</div>
+  <div class="sec-eye"><span>Section 7 · Model 3 — Score + Classification + Biodynamic → Price</span></div>
+  <h2>What actually drives en primeur prices — quality or prestige?</h2>
+  <p class="sec-lead">Model 3 predicts bottle price (log-transformed) using château score, vintage score, classification tier, and biodynamic status. The dependent variable is log(price_usd) — coefficients represent percentage price changes, which is more meaningful than dollar amounts across a $36–$469 range. Data filtered to 2019–2024 where Wine-Searcher price data is available.</p>
+
+  <div class="pue-chain">
+    <div class="chain-step">
+      <div class="chain-n">Train R²</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">78.2%</strong> — Score + bio + classification explains 78% of price variation in-sample.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">CV R²</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">71.6%</strong> — 5-fold cross-validation. 6.6% gap — modest overfitting acceptable given N=114.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">MAE</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">~25%</strong> — Average price prediction error. The unexplained 25% is the prestige premium.</div>
+    </div>
+    <div class="chain-step">
+      <div class="chain-n">N · Observations</div>
+      <div class="chain-txt"><strong style="color:var(--wine)">114</strong> — 19 châteaux, 2019–2024. 1st Growths excluded (no Wine-Searcher price data in scrape).</div>
+    </div>
+  </div>
+
+  <div class="model-tbl-wrap tbl-wrap" style="margin-bottom:24px">
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th><th>Coef</th><th>Std Err</th><th>p-value</th><th>Sig</th><th>VIF</th><th>Price Effect</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family:var(--font-mono)">score</td>
+          <td style="text-align:center" class="coef-pos">+0.264</td><td style="text-align:center">0.035</td><td style="text-align:center">&lt;0.001</td>
+          <td style="text-align:center"><span class="sig-badge sig-3">***</span></td><td style="text-align:center">6.1</td>
+          <td class="coef-pos"><strong>+30.2% per point</strong></td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">biodynamic</td>
+          <td style="text-align:center" class="coef-pos">+0.244</td><td style="text-align:center">0.120</td><td style="text-align:center">0.045</td>
+          <td style="text-align:center"><span class="sig-badge sig-1">*</span></td><td style="text-align:center">1.9</td>
+          <td class="coef-pos"><strong>+27.6%</strong></td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">vintage_score</td>
+          <td style="text-align:center" class="coef-neg">−0.027</td><td style="text-align:center">0.014</td><td style="text-align:center">0.047</td>
+          <td style="text-align:center"><span class="sig-badge sig-1">*</span></td><td style="text-align:center">2.4</td>
+          <td class="coef-neg">−2.7% per point</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_2 (2nd Growth)</td>
+          <td style="text-align:center">+0.143</td><td style="text-align:center">0.114</td><td style="text-align:center">0.214</td>
+          <td style="text-align:center"><span class="sig-badge sig-ns">ns</span></td><td style="text-align:center">3.9</td>
+          <td style="color:var(--text-3)">+15.4% (not significant)</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_4 (4th Growth)</td>
+          <td style="text-align:center">+0.078</td><td style="text-align:center">0.097</td><td style="text-align:center">0.421</td>
+          <td style="text-align:center"><span class="sig-badge sig-ns">ns</span></td><td style="text-align:center">2.2</td>
+          <td style="color:var(--text-3)">+8.1% (not significant)</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono)">class_5 (5th Growth)</td>
+          <td style="text-align:center">−0.099</td><td style="text-align:center">0.080</td><td style="text-align:center">0.219</td>
+          <td style="text-align:center"><span class="sig-badge sig-ns">ns</span></td><td style="text-align:center">1.7</td>
+          <td style="color:var(--text-3)">−9.4% (not significant)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote">*** p&lt;0.001 · * p&lt;0.05 · ns = not significant · Dep. var = log(price_usd) · class_1 dropped — no 1st Growth price data in scrape · 3rd Growth reference category</p>
+
+  <div class="chart-card" style="margin-top:20px">
+    <div class="chart-title">Model 3 · Price Effect of Each Variable (% Change in Bottle Price)</div>
+    <div class="chart-sub">Green = significant positive · Red = significant negative · Grey = not statistically significant once score is controlled for</div>
+    <div style="position:relative;height:240px"><canvas id="chart7"></canvas></div>
+  </div>
+
+  <div class="analysis-block">
+    <p><strong>The key finding:</strong> Once critics have scored the wine, the 1855 Classification adds no statistically significant price power. Score explains everything. The ranking that determines how collectors think about these wines — the tier that shapes which bottles end up in investment portfolios — disappears when you actually look at the data. <strong>Classification matters only because it shapes what critics expect to taste, and what buyers expect to pay. The moment the score is published, the tier is irrelevant.</strong></p>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 8 ══════════ -->
+<div class="section" id="s8">
+  <div class="sec-num">8</div>
+  <div class="sec-eye"><span>Section 8 · Price vs Quality</span></div>
+  <h2>Which châteaux are mispriced relative to their quality?</h2>
+  <p class="sec-lead">The model predicts price from score, vintage quality, classification, and biodynamic status. Châteaux where actual price far exceeds predicted price carry a prestige premium the model can't explain. Châteaux where actual price falls below predicted are potentially undervalued relative to what the score would justify.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Score vs Price · 19 Châteaux · 2019–2024</div>
+    <div class="chart-sub">Each point = one château-vintage · Bubble size = classification tier (larger = higher tier) · Gold outline = biodynamic certified · Hover for château name</div>
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>Margaux</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2980b9"></div>Pauillac</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#27ae60"></div>St-Julien</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8e44ad"></div>St-Estèphe</div>
+      <div class="leg-ring" style="border-color:#b5862e"></div><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-2)">Biodynamic</span>
+    </div>
+    <div style="position:relative;height:360px"><canvas id="chart8"></canvas></div>
+  </div>
+
+  <div class="policy-grid">
+    <div class="policy-card" style="border-top-color:var(--c-red)">
+      <div class="policy-n">Prestige gap</div>
+      <div class="policy-head" style="color:var(--c-red)">Palmer · $306 unexplained</div>
+      <div class="policy-txt">Model predicts ~$129 per bottle (2022). Actual: $435. The $306 gap isn't in the wine — it's in the name. Evidence: +1.68pt residual across 25 years. A Third Growth that scores like a First and charges like one. The Liv-ex 2009 reclassification — based on secondary market trading — would classify Palmer as a First Growth. The 1855 list hasn't caught up in 170 years.</div>
+    </div>
+    <div class="policy-card" style="border-top-color:var(--c-green)">
+      <div class="policy-n">Underpriced relative to quality</div>
+      <div class="policy-head" style="color:var(--c-green)">Montrose · 2nd Growth value</div>
+      <div class="policy-txt">In 2022, Montrose scored 98pts — matching the top First Growths — and sold for $233. Model predicts ~$341. Montrose (St-Estèphe, 2nd Growth) carries less brand recognition than Pauillac peers at the same quality level. The data suggests it may be structurally underpriced relative to what the score would justify.</div>
+    </div>
+    <div class="policy-card">
+      <div class="policy-n">The closing line</div>
+      <div class="policy-head">The gap is the story</div>
+      <div class="policy-txt">The ~25% MAE in Model 3 isn't a model failure — it's a feature. The part of price the model can't explain is the prestige premium. Palmer's $306 gap is that premium in dollar terms. <em>Nature makes the wine. Humans make the price. The gap between the two is where all the money lives.</em></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="wrap">
+    Dataset: IEEE BordeauxWines Dataset (14,349 critic reviews, 2000–2016) · Meteo France / Ashenfelter (1988) vintage weather data<br>
+    Wine-Searcher aggregated critic scores &amp; prices (2017–2024) · 1855 Official Classification · Liv-ex Market Data<br>
+    Methodology: OLS Linear Regression · 5-fold Cross-Validation · N=528 château-vintage observations (Model 2) · N=114 price observations (Model 3)<br><br>
+    Analysis by Erwiena Wrichny · <a href="https://www.linkedin.com/in/ewrichny/" target="_blank">LinkedIn</a> · <a href="mailto:ewrichny@outlook.com">Email</a> · <a href="https://github.com/erwienawrichny" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+<script>
+Chart.defaults.font.family = "'Source Sans 3', system-ui, sans-serif";
+Chart.defaults.color = "#a1a1aa";
+const gridOpts = { color:"#f0ede7", border:{ color:"#e4e0d8" } };
+const WINE = '#6b1a2a';
+const GREEN = '#0a7c52';
+const RED = '#b91c1c';
+const BLUE = '#2563a8';
+const GRAY = '#52525b';
+const GOLD = '#b5862e';
+
+// ── Chart 1: Vintage actual vs predicted + rainfall bars ──
+const vintageData = {
+  years: [1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
+  actual:    [96,93,82,90,89,78,90,95,96,76,75,78,85,92,91,86,87,84,96,92,88,92,90,95,90,87,90,96,96,91,89,88,91,94,95,90,96,96,94,88,97,93,91],
+  predicted: [93.0,91.9,83.0,91.5,86.7,80.8,91.4,95.6,96.6,84.8,81.6,82.6,88.9,93.2,91.3,88.6,88.5,85.1,93.1,89.0,84.1,98.7,86.9,94.6,88.8,83.1,88.9,96.2,94.9,90.8,86.8,83.1,90.6,93.9,93.8,89.0,96.5,95.2,93.4,84.5,97.8,91.3,88.0],
+  rain:      [20,35,80,25,60,95,30,15,10,70,90,85,45,20,30,55,50,75,25,50,80,15,60,18,55,90,45,12,20,40,65,85,35,22,18,50,15,20,30,80,12,40,60]
+};
+
+new Chart(document.getElementById('chart1'), {
+  type: 'line',
+  data: {
+    labels: vintageData.years,
+    datasets: [
+      { label:'Actual Score', data:vintageData.actual, borderColor:WINE, backgroundColor:'transparent', borderWidth:2.5, pointRadius:3, pointBackgroundColor:WINE, tension:0.3, yAxisID:'y' },
+      { label:'Predicted Score', data:vintageData.predicted, borderColor:BLUE, backgroundColor:'transparent', borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:0.3, yAxisID:'y' },
+      { label:'Harvest Rain (mm)', data:vintageData.rain, type:'bar', backgroundColor:'rgba(107,26,42,0.12)', borderColor:'rgba(107,26,42,0.3)', borderWidth:1, yAxisID:'y2' }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ labels:{ color:'#52525b', font:{size:11} } }, tooltip:{ mode:'index', intersect:false } },
+    scales: {
+      x: { ticks:{ maxTicksLimit:12, color:'#a1a1aa', font:{size:10} }, grid:gridOpts },
+      y: { position:'left', min:72, max:102, ticks:{ color:'#a1a1aa', font:{size:10} }, grid:gridOpts, title:{ display:true, text:'Vintage Score', color:'#52525b', font:{size:10} } },
+      y2: { position:'right', min:0, max:150, grid:{ display:false }, ticks:{ color:'#a1a1aa', font:{size:10} }, title:{ display:true, text:'Harvest Rain (mm)', color:'#52525b', font:{size:10} } }
+    }
+  }
+});
+
+// ── Chart 2: Temp vs score scatter ──
+const scatterData = vintageData.years.map((y,i) => ({
+  x: [17.5,17.8,16.2,17.1,16.8,16.0,17.3,18.4,18.6,16.5,16.1,16.3,17.0,17.6,17.2,17.4,17.1,16.9,17.8,17.3,16.7,19.8,16.9,18.1,17.5,16.8,17.0,18.5,18.3,17.6,17.1,16.5,17.2,18.0,17.7,17.3,18.8,18.5,18.2,16.9,19.2,17.8,17.4][i],
+  y: vintageData.actual[i], year: y, rain: vintageData.rain[i]
+}));
+
+new Chart(document.getElementById('chart2'), {
+  type:'scatter',
+  data: { datasets:[{ label:'Vintage', data:scatterData,
+    backgroundColor: scatterData.map(d => `rgba(107,26,42,${0.3 + (100-d.rain)/150})`),
+    borderColor: WINE, borderWidth:1,
+    pointRadius: scatterData.map(d => 4 + d.rain/25) }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => `${ctx.raw.year}: score ${ctx.raw.y} | temp ${ctx.raw.x}°C | rain ${ctx.raw.rain}mm` } } },
+    scales: {
+      x: { min:15.5, max:20.2, title:{ display:true, text:'Avg Growing Season Temp (°C)', color:'#52525b', font:{size:11} }, ticks:{ color:'#a1a1aa' }, grid:gridOpts },
+      y: { min:72, max:100, title:{ display:true, text:'Vintage Score', color:'#52525b', font:{size:11} }, ticks:{ color:'#a1a1aa' }, grid:gridOpts }
+    }
+  }
+});
+
+// ── Chart 3: Classification premiums ──
+new Chart(document.getElementById('chart3'), {
+  type:'bar',
+  data: {
+    labels: ['1st Growth', '2nd Growth', '3rd Growth (reference)', '4th Growth', '5th Growth'],
+    datasets:[{ data:[3.40,2.30,0,-1.67,-0.18],
+      backgroundColor: ['rgba(10,124,82,0.15)','rgba(10,124,82,0.15)','rgba(82,82,91,0.1)','rgba(185,28,28,0.15)','rgba(82,82,91,0.1)'],
+      borderColor: [GREEN, GREEN, GRAY, RED, GRAY],
+      borderWidth: 2
+    }]
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => {
+      const sig = [true,true,true,true,false][ctx.dataIndex];
+      return `${ctx.raw > 0 ? '+' : ''}${ctx.raw} pts vs 3rd Growth ${sig ? '(p<0.001 ***)' : '(not sig., p=0.42)'}`;
+    } } } },
+    scales: {
+      x: { min:-2.5, max:4.5, grid:gridOpts, ticks:{ color:'#a1a1aa' }, title:{ display:true, text:'Points vs 3rd Growth', color:'#52525b', font:{size:11} } },
+      y: { ticks:{ color:'#18181b', font:{size:12} }, grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 4: Château scatter by classification + appellation ──
+const chateauData = [
+  {name:"Beychevelle",cls:4,app:"St-Julien",score:90.88,res:0.19},
+  {name:"Calon-Segur",cls:3,app:"St-Estephe",score:92.68,res:0.32},
+  {name:"Clerc-Milon",cls:5,app:"Pauillac",score:91.8,res:-0.38},
+  {name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:95.5,res:0.35},
+  {name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:94.4,res:-0.25},
+  {name:"Duhart-Milon",cls:4,app:"Pauillac",score:90.72,res:0.03},
+  {name:"Giscours",cls:3,app:"Margaux",score:91.68,res:-0.68},
+  {name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:91.6,res:-0.58},
+  {name:"Haut-Brion",cls:1,app:"Pessac-Leognan",score:95.68,res:-0.08},
+  {name:"Lafite Rothschild",cls:1,app:"Pauillac",score:95.6,res:-0.16},
+  {name:"Lagrange",cls:3,app:"St-Julien",score:91.04,res:-1.32},
+  {name:"Latour",cls:1,app:"Pauillac",score:96.38,res:0.12},
+  {name:"Leoville Barton",cls:2,app:"St-Julien",score:94.24,res:-0.41},
+  {name:"Leoville Las Cases",cls:2,app:"St-Julien",score:95.72,res:1.07},
+  {name:"Lynch-Bages",cls:5,app:"Pauillac",score:93.28,res:1.1},
+  {name:"Margaux",cls:1,app:"Margaux",score:96.5,res:0.25},
+  {name:"Montrose",cls:2,app:"St-Estephe",score:94.12,res:-0.53},
+  {name:"Mouton Rothschild",cls:1,app:"Pauillac",score:96.62,res:0.37},
+  {name:"Palmer",cls:3,app:"Margaux",score:94.04,res:1.68},
+  {name:"Pichon Baron",cls:2,app:"Pauillac",score:94.54,res:-0.24},
+  {name:"Pichon Lalande",cls:2,app:"Pauillac",score:95.62,res:0.48},
+  {name:"Pontet-Canet",cls:5,app:"Pauillac",score:93.68,res:1.5},
+  {name:"Prieure-Lichine",cls:4,app:"Margaux",score:90.44,res:-0.25},
+  {name:"Talbot",cls:4,app:"St-Julien",score:90.72,res:0.03},
+  {name:"d'Armailhac",cls:5,app:"Pauillac",score:90.56,res:-1.62}
+];
+const appColors = {Margaux:'#c0392b',Pauillac:'#2980b9','St-Julien':'#27ae60','St-Estephe':'#8e44ad','Pessac-Leognan':'#e67e22'};
+
+new Chart(document.getElementById('chart4'), {
+  type:'bubble',
+  data: { datasets:[{ data: chateauData.map(c => ({ x:c.cls, y:c.score, r:7+Math.abs(c.res)*4, name:c.name, res:c.res, app:c.app })),
+    backgroundColor: chateauData.map(c => appColors[c.app]+'cc'),
+    borderColor: chateauData.map(c => appColors[c.app]), borderWidth:1.5 }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => [
+      `${ctx.raw.name}`, `${ctx.raw.app} · ${ctx.raw.x}G`,
+      `Avg Score: ${ctx.raw.y.toFixed(1)}`, `Residual: ${ctx.raw.res>=0?'+':''}${ctx.raw.res.toFixed(2)}`
+    ] } } },
+    scales: {
+      x: { min:0.5, max:5.5, ticks:{ stepSize:1, color:'#a1a1aa', callback: v => ['','1st','2nd','3rd','4th','5th'][v]||'' }, grid:gridOpts, title:{ display:true, text:'1855 Classification', color:'#52525b', font:{size:11} } },
+      y: { min:88, max:100, grid:gridOpts, ticks:{ color:'#a1a1aa' }, title:{ display:true, text:'Avg Score 2000–2024', color:'#52525b', font:{size:11} } }
+    }
+  }
+});
+
+// ── Chart 5: Residuals ──
+const sortedRes = [...chateauData].sort((a,b) => a.res - b.res);
+new Chart(document.getElementById('chart5'), {
+  type:'bar',
+  data: { datasets:[{ data: sortedRes.map(c => c.res),
+    backgroundColor: sortedRes.map(c => c.res>=0 ? (Math.abs(c.res)>1 ? 'rgba(10,124,82,0.2)' : 'rgba(10,124,82,0.1)') : (Math.abs(c.res)>1 ? 'rgba(185,28,28,0.2)' : 'rgba(185,28,28,0.1)')),
+    borderColor: sortedRes.map(c => c.res>=0 ? GREEN : RED),
+    borderWidth:1.5
+  }],
+  labels: sortedRes.map(c => c.name)
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => `${ctx.raw>=0?'+':''}${ctx.raw.toFixed(2)} pts · ${sortedRes[ctx.dataIndex].cls}G · ${sortedRes[ctx.dataIndex].app}` } } },
+    scales: {
+      x: { min:-2.2, max:2.4, grid:gridOpts, ticks:{ color:'#a1a1aa' }, title:{ display:true, text:'Avg Residual (pts above/below prediction)', color:'#52525b', font:{size:11} } },
+      y: { ticks:{ color:'#18181b', font:{size:11} }, grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 7: Price effects ──
+const priceEffects = [
+  { label:'Score (+1pt)', pct:30.2, sig:true, pos:true },
+  { label:'Biodynamic', pct:27.6, sig:true, pos:true },
+  { label:'Vintage Score (+1pt)', pct:-2.7, sig:true, pos:false },
+  { label:'2nd Growth', pct:15.4, sig:false, pos:true },
+  { label:'4th Growth', pct:8.1, sig:false, pos:true },
+  { label:'5th Growth', pct:-9.4, sig:false, pos:false },
+];
+new Chart(document.getElementById('chart7'), {
+  type:'bar',
+  data: { labels: priceEffects.map(d => d.label), datasets:[{
+    data: priceEffects.map(d => d.pct),
+    backgroundColor: priceEffects.map(d => d.sig ? (d.pos ? 'rgba(10,124,82,0.15)' : 'rgba(185,28,28,0.15)') : 'rgba(82,82,91,0.1)'),
+    borderColor: priceEffects.map(d => d.sig ? (d.pos ? GREEN : RED) : GRAY),
+    borderWidth:2
+  }] },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => `${ctx.raw>0?'+':''}${ctx.raw}% · ${priceEffects[ctx.dataIndex].sig ? 'statistically significant' : 'NOT significant'}` } } },
+    scales: {
+      x: { ticks:{ color:'#18181b', font:{size:11} }, grid:{ display:false } },
+      y: { grid:gridOpts, ticks:{ color:'#a1a1aa', callback: v => v+'%' }, title:{ display:true, text:'% Price Effect', color:'#52525b', font:{size:11} } }
+    }
+  }
+});
+
+// ── Chart 8: Score vs price scatter ──
+const priceData = [
+  {name:"Beychevelle",cls:4,app:"St-Julien",score:93,price:157,bio:0},{name:"Beychevelle",cls:4,app:"St-Julien",score:93,price:118,bio:0},{name:"Beychevelle",cls:4,app:"St-Julien",score:92,price:96,bio:0},{name:"Beychevelle",cls:4,app:"St-Julien",score:94,price:110,bio:0},{name:"Beychevelle",cls:4,app:"St-Julien",score:94,price:104,bio:0},{name:"Beychevelle",cls:4,app:"St-Julien",score:92,price:88,bio:0},
+  {name:"Calon-Segur",cls:3,app:"St-Estephe",score:95,price:193,bio:0},{name:"Calon-Segur",cls:3,app:"St-Estephe",score:95,price:163,bio:0},{name:"Calon-Segur",cls:3,app:"St-Estephe",score:93,price:127,bio:0},{name:"Calon-Segur",cls:3,app:"St-Estephe",score:95,price:161,bio:0},{name:"Calon-Segur",cls:3,app:"St-Estephe",score:95,price:134,bio:0},{name:"Calon-Segur",cls:3,app:"St-Estephe",score:94,price:96,bio:0},
+  {name:"Clerc-Milon",cls:5,app:"Pauillac",score:93,price:135,bio:0},{name:"Clerc-Milon",cls:5,app:"Pauillac",score:94,price:115,bio:0},{name:"Clerc-Milon",cls:5,app:"Pauillac",score:92,price:79,bio:0},{name:"Clerc-Milon",cls:5,app:"Pauillac",score:94,price:95,bio:0},{name:"Clerc-Milon",cls:5,app:"Pauillac",score:93,price:99,bio:0},{name:"Clerc-Milon",cls:5,app:"Pauillac",score:92,price:60,bio:0},
+  {name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:97,price:236,bio:0},{name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:96,price:241,bio:0},{name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:94,price:217,bio:0},{name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:96,price:275,bio:0},{name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:96,price:182,bio:0},{name:"Cos d'Estournel",cls:2,app:"St-Estephe",score:94,price:123,bio:0},
+  {name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:96,price:252,bio:0},{name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:96,price:276,bio:0},{name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:94,price:218,bio:0},{name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:96,price:280,bio:0},{name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:95,price:200,bio:0},{name:"Ducru-Beaucaillou",cls:2,app:"St-Julien",score:95,price:116,bio:0},
+  {name:"Giscours",cls:3,app:"Margaux",score:94,price:87,bio:0},{name:"Giscours",cls:3,app:"Margaux",score:94,price:79,bio:0},{name:"Giscours",cls:3,app:"Margaux",score:92,price:79,bio:0},{name:"Giscours",cls:3,app:"Margaux",score:94,price:100,bio:0},{name:"Giscours",cls:3,app:"Margaux",score:94,price:79,bio:0},{name:"Giscours",cls:3,app:"Margaux",score:92,price:59,bio:0},
+  {name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:94,price:98,bio:0},{name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:94,price:88,bio:0},{name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:92,price:76,bio:0},{name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:94,price:100,bio:0},{name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:93,price:78,bio:0},{name:"Grand-Puy-Lacoste",cls:5,app:"Pauillac",score:92,price:56,bio:0},
+  {name:"Lagrange",cls:3,app:"St-Julien",score:93,price:70,bio:0},{name:"Lagrange",cls:3,app:"St-Julien",score:93,price:67,bio:0},{name:"Lagrange",cls:3,app:"St-Julien",score:91,price:54,bio:0},{name:"Lagrange",cls:3,app:"St-Julien",score:93,price:66,bio:0},{name:"Lagrange",cls:3,app:"St-Julien",score:93,price:62,bio:0},{name:"Lagrange",cls:3,app:"St-Julien",score:92,price:47,bio:0},
+  {name:"Leoville Barton",cls:2,app:"St-Julien",score:97,price:262,bio:0},{name:"Leoville Barton",cls:2,app:"St-Julien",score:96,price:315,bio:0},{name:"Leoville Barton",cls:2,app:"St-Julien",score:94,price:240,bio:0},{name:"Leoville Barton",cls:2,app:"St-Julien",score:98,price:351,bio:0},{name:"Leoville Barton",cls:2,app:"St-Julien",score:96,price:224,bio:0},{name:"Leoville Barton",cls:2,app:"St-Julien",score:95,price:125,bio:0},
+  {name:"Leoville Las Cases",cls:2,app:"St-Julien",score:97,price:262,bio:0},{name:"Leoville Las Cases",cls:2,app:"St-Julien",score:97,price:315,bio:0},{name:"Leoville Las Cases",cls:2,app:"St-Julien",score:94,price:240,bio:0},{name:"Leoville Las Cases",cls:2,app:"St-Julien",score:98,price:351,bio:0},{name:"Leoville Las Cases",cls:2,app:"St-Julien",score:97,price:224,bio:0},{name:"Leoville Las Cases",cls:2,app:"St-Julien",score:95,price:125,bio:0},
+  {name:"Lynch-Bages",cls:5,app:"Pauillac",score:95,price:182,bio:0},{name:"Lynch-Bages",cls:5,app:"Pauillac",score:95,price:165,bio:0},{name:"Lynch-Bages",cls:5,app:"Pauillac",score:93,price:134,bio:0},{name:"Lynch-Bages",cls:5,app:"Pauillac",score:95,price:166,bio:0},{name:"Lynch-Bages",cls:5,app:"Pauillac",score:95,price:125,bio:0},{name:"Lynch-Bages",cls:5,app:"Pauillac",score:93,price:78,bio:0},
+  {name:"Montrose",cls:2,app:"St-Estephe",score:97,price:209,bio:0},{name:"Montrose",cls:2,app:"St-Estephe",score:97,price:230,bio:0},{name:"Montrose",cls:2,app:"St-Estephe",score:94,price:170,bio:0},{name:"Montrose",cls:2,app:"St-Estephe",score:98,price:233,bio:0},{name:"Montrose",cls:2,app:"St-Estephe",score:97,price:189,bio:0},{name:"Montrose",cls:2,app:"St-Estephe",score:95,price:108,bio:0},
+  {name:"Palmer",cls:3,app:"Margaux",score:97,price:335,bio:1},{name:"Palmer",cls:3,app:"Margaux",score:96,price:391,bio:1},{name:"Palmer",cls:3,app:"Margaux",score:94,price:328,bio:1},{name:"Palmer",cls:3,app:"Margaux",score:97,price:435,bio:1},{name:"Palmer",cls:3,app:"Margaux",score:96,price:362,bio:1},{name:"Palmer",cls:3,app:"Margaux",score:95,price:202,bio:1},
+  {name:"Pichon Lalande",cls:2,app:"Pauillac",score:96,price:335,bio:0},{name:"Pichon Lalande",cls:2,app:"Pauillac",score:96,price:242,bio:0},{name:"Pichon Lalande",cls:2,app:"Pauillac",score:94,price:193,bio:0},{name:"Pichon Lalande",cls:2,app:"Pauillac",score:97,price:250,bio:0},{name:"Pichon Lalande",cls:2,app:"Pauillac",score:97,price:181,bio:0},{name:"Pichon Lalande",cls:2,app:"Pauillac",score:94,price:127,bio:0},
+  {name:"Pontet-Canet",cls:5,app:"Pauillac",score:96,price:153,bio:1},{name:"Pontet-Canet",cls:5,app:"Pauillac",score:95,price:150,bio:1},{name:"Pontet-Canet",cls:5,app:"Pauillac",score:93,price:103,bio:1},{name:"Pontet-Canet",cls:5,app:"Pauillac",score:96,price:141,bio:1},{name:"Pontet-Canet",cls:5,app:"Pauillac",score:96,price:121,bio:1},{name:"Pontet-Canet",cls:5,app:"Pauillac",score:94,price:82,bio:1},
+  {name:"Prieure-Lichine",cls:4,app:"Margaux",score:92,price:52,bio:0},{name:"Prieure-Lichine",cls:4,app:"Margaux",score:92,price:55,bio:0},{name:"Prieure-Lichine",cls:4,app:"Margaux",score:90,price:44,bio:0},{name:"Prieure-Lichine",cls:4,app:"Margaux",score:93,price:55,bio:0},{name:"Prieure-Lichine",cls:4,app:"Margaux",score:92,price:51,bio:0},{name:"Prieure-Lichine",cls:4,app:"Margaux",score:91,price:36,bio:0},
+  {name:"Talbot",cls:4,app:"St-Julien",score:93,price:102,bio:0},{name:"Talbot",cls:4,app:"St-Julien",score:92,price:83,bio:0},{name:"Talbot",cls:4,app:"St-Julien",score:91,price:64,bio:0},{name:"Talbot",cls:4,app:"St-Julien",score:93,price:90,bio:0},{name:"Talbot",cls:4,app:"St-Julien",score:93,price:72,bio:0},{name:"Talbot",cls:4,app:"St-Julien",score:91,price:56,bio:0},
+  {name:"d'Armailhac",cls:5,app:"Pauillac",score:93,price:75,bio:0},{name:"d'Armailhac",cls:5,app:"Pauillac",score:92,price:80,bio:0},{name:"d'Armailhac",cls:5,app:"Pauillac",score:91,price:55,bio:0},{name:"d'Armailhac",cls:5,app:"Pauillac",score:93,price:75,bio:0},{name:"d'Armailhac",cls:5,app:"Pauillac",score:92,price:60,bio:0},{name:"d'Armailhac",cls:5,app:"Pauillac",score:91,price:37,bio:0}
+];
+
+new Chart(document.getElementById('chart8'), {
+  type:'bubble',
+  data: { datasets:[{ data: priceData.map(d => ({
+    x:d.score, y:d.price,
+    r: d.cls===1?9:d.cls===2?7:d.cls===3?6:5,
+    name:d.name, cls:d.cls, app:d.app, bio:d.bio
+  })),
+    backgroundColor: priceData.map(d => appColors[d.app]+'aa'),
+    borderColor: priceData.map(d => d.bio ? GOLD : appColors[d.app]),
+    borderWidth: priceData.map(d => d.bio ? 2.5 : 1)
+  }] },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => [
+      `${ctx.raw.name}`,
+      `${ctx.raw.cls}G · ${ctx.raw.app}${ctx.raw.bio?' · Biodynamic':''}`,
+      `Score: ${ctx.raw.x} | Price: $${ctx.raw.y}`
+    ] } } },
+    scales: {
+      x: { min:88, max:100, ticks:{ color:'#a1a1aa' }, grid:gridOpts, title:{ display:true, text:'Critic Score', color:'#52525b', font:{size:11} } },
+      y: { min:0, max:480, ticks:{ color:'#a1a1aa', callback: v => '$'+v }, grid:gridOpts, title:{ display:true, text:'Price (USD/bottle)', color:'#52525b', font:{size:11} } }
+    }
+  }
+});
+
+// Palmer label on chart 8
+Chart.register({ id:'palmerLabel', afterDraw(chart) {
+  if(chart.canvas.id !== 'chart8') return;
+  const ctx = chart.ctx; ctx.save();
+  const palmerPoints = priceData.reduce((acc, d, i) => {
+    if(d.name === 'Palmer') acc.push(i); return acc;
+  }, []);
+  const meta = chart.getDatasetMeta(0);
+  if(!meta.visible) { ctx.restore(); return; }
+  ctx.font = 'bold 10px "Source Sans 3", sans-serif';
+  ctx.fillStyle = WINE; ctx.textAlign = 'left';
+  palmerPoints.forEach(i => {
+    const pt = meta.data[i]; if(!pt) return;
+    ctx.fillText('Palmer ★', pt.x + 8, pt.y - 4);
+  });
+  ctx.restore();
+}});
+
+// Nav active
+function updateNav(){
+  const ids=['s1','s2','s3','s4','s5','s6','s7','s8'];
+  const y = window.scrollY + 80; let active = '';
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el&&el.offsetTop<=y) active=id; });
+  document.querySelectorAll('.nav-sec').forEach(el=>el.classList.toggle('active', el.getAttribute('href')==='#'+active));
+}
+window.addEventListener('scroll', updateNav, {passive:true});
+document.addEventListener('DOMContentLoaded', updateNav);
+
+// Chapter dropdown
+const chapterDrop = document.querySelector('.nav-chapter-dropdown');
+chapterDrop.addEventListener('click', e => { e.stopPropagation(); chapterDrop.classList.toggle('open'); });
+document.addEventListener('click', () => chapterDrop.classList.remove('open'));
+</script>
+</body>
+</html>

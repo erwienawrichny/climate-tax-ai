@@ -11,7 +11,7 @@
 <style>
 :root {
   --bg:#f7f5f0; --white:#fff; --text:#18181b; --text-2:#52525b; --text-3:#a1a1aa;
-  --border:#e4e0d8; --navy:#1b3a6b; --substack:#ff6719;
+  --border:#e4e0d8; --navy:#14532d; --substack:#ff6719;
   --c-green:#0a7c52; --c-green-bg:#ecfdf5;
   --c-gray:#52525b;  --c-gray-bg:#f4f4f5;
   --c-amber:#b45309; --c-amber-bg:#fef3c7;
@@ -70,7 +70,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:500;height:56px;display
 /* SECTIONS */
 .section{padding:68px 0 60px;border-bottom:1px solid var(--border);position:relative}
 .section:last-child{border-bottom:none}
-.sec-num{position:absolute;top:44px;right:-8px;font-family:var(--font-serif);font-size:160px;font-weight:900;color:rgba(27,58,107,.04);line-height:1;pointer-events:none;user-select:none}
+.sec-num{position:absolute;top:44px;right:-8px;font-family:var(--font-serif);font-size:160px;font-weight:900;color:rgba(20,83,45,.04);line-height:1;pointer-events:none;user-select:none}
 .sec-eye{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .sec-eye::before{content:'';display:block;width:20px;height:1.5px;background:var(--c-green)}
 .sec-eye span{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
@@ -282,7 +282,7 @@ footer a:hover{color:var(--navy)}
     <div class="chapter-menu">
       <a href="home.html" class="chapter-menu-item" style="text-decoration:none;display:block">Home</a>
       <div class="chapter-menu-item active">Chapter 01 · Infrastructure Finance</div>
-      <div class="chapter-menu-item coming">Chapter 02 · Coming soon…</div>
+      <a href="bordeaux_v1.html" class="chapter-menu-item" style="text-decoration:none;display:block">Chapter 02 · Bordeaux Wine Analysis</a>
     </div>
   </div>
   <div class="nav-sections">
@@ -423,7 +423,7 @@ footer a:hover{color:var(--navy)}
       <div class="leg-item"><div class="leg-dot" style="background:#52525b"></div> Moderate (1.09–1.11)</div>
       <div class="leg-item"><div class="leg-dot" style="background:#b45309"></div> Material Gap (1.11–1.12)</div>
       <div class="leg-item"><div class="leg-dot" style="background:#b91c1c"></div> Largest Gap (&gt; 1.12)</div>
-      <div class="leg-item"><div class="leg-line" style="border-color:#1b3a6b;opacity:.5"></div> Fleet avg 1.09</div>
+      <div class="leg-item"><div class="leg-line" style="border-color:#14532d;opacity:.5"></div> Fleet avg 1.09</div>
     </div>
     <div class="scroll-chart-wrap" style="max-height:480px">
       <div style="position:relative;height:920px">
@@ -824,7 +824,7 @@ new Chart(document.getElementById("pueAll29"), {
     plugins:{
       legend:{ display:true, position:"bottom", labels:{ font:{family:"JetBrains Mono",size:10}, padding:16, usePointStyle:true }},
       tooltip:{
-        backgroundColor:"#1b3a6b", titleFont:{family:"JetBrains Mono",size:11}, bodyFont:{family:"JetBrains Mono",size:11}, padding:12,
+        backgroundColor:"#14532d", titleFont:{family:"JetBrains Mono",size:11}, bodyFont:{family:"JetBrains Mono",size:11}, padding:12,
         callbacks:{
           title:ctx=>sorted29[ctx[0].dataIndex].name,
           label:ctx=>` ${ctx.dataset.label}: ${ctx.raw.toFixed(3)} (${TIER_LBL[tierOf(ctx.raw)]})`
@@ -844,9 +844,9 @@ Chart.register({id:"fleetAvgLine", afterDraw(chart){
   if(chart.canvas.id!=="pueAll29")return;
   const x=chart.scales.x.getPixelForValue(1.09);
   const ctx=chart.ctx; ctx.save();
-  ctx.setLineDash([5,5]); ctx.strokeStyle="rgba(27,58,107,0.55)"; ctx.lineWidth=1.5;
+  ctx.setLineDash([5,5]); ctx.strokeStyle="rgba(20,83,45,0.55)"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(x,chart.chartArea.top); ctx.lineTo(x,chart.chartArea.bottom); ctx.stroke();
-  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.65)"; ctx.font="9px JetBrains Mono";
+  ctx.setLineDash([]); ctx.fillStyle="rgba(20,83,45,0.65)"; ctx.font="9px JetBrains Mono";
   ctx.fillText("Fleet avg 1.09",x+4,chart.chartArea.top+14); ctx.restore();
 }});
 
@@ -869,7 +869,7 @@ new Chart(document.getElementById("bubbleGoogle"),{
   options:{
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+      tooltip:{backgroundColor:"#14532d",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
         callbacks:{
           title:ctx=>ctx[0].raw.name,
           label:ctx=>{const d=ctx.raw;const g=Math.abs(d.gapM).toFixed(2);return[` PUE 2025: ${d.pue?.[2025]?.toFixed(3)||"—"}`,` CO₂: ${d.co2?.toLocaleString()} tons/yr`,` Gap: ${d.gapM>=0?`underpays $${g}M`:`overpays $${g}M`}`,d.coolM?` Cooling: $${d.coolM.toFixed(1)}M/yr`:` Cooling: N/A (state elec.)`]}
@@ -887,9 +887,9 @@ new Chart(document.getElementById("bubbleGoogle"),{
 Chart.register({id:"zeroLineBubble",afterDraw(chart){
   if(!["bubbleGoogle","bubbleGrowing"].includes(chart.canvas.id))return;
   const y0=chart.scales.y.getPixelForValue(0); const ctx=chart.ctx; ctx.save();
-  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(27,58,107,0.35)"; ctx.lineWidth=1.5;
+  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(20,83,45,0.35)"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(chart.chartArea.left,y0); ctx.lineTo(chart.chartArea.right,y0); ctx.stroke();
-  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.5)"; ctx.font="9px JetBrains Mono";
+  ctx.setLineDash([]); ctx.fillStyle="rgba(20,83,45,0.5)"; ctx.font="9px JetBrains Mono";
   ctx.fillText("EU ETS breakeven ($70.37/ton)",chart.chartArea.left+6,y0-5); ctx.restore();
 }});
 
@@ -923,7 +923,7 @@ new Chart(document.getElementById("corrChart"),{
     indexAxis:"y",
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:10,
+      tooltip:{backgroundColor:"#14532d",bodyFont:{family:"JetBrains Mono",size:11},padding:10,
         callbacks:{label:ctx=>{const v=ctx.raw;return ` r = ${v>=0?"+":""}${v.toFixed(3)}`}}}
     },
     scales:{
@@ -953,7 +953,7 @@ new Chart(document.getElementById("scatterChart"),{
   options:{
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+      tooltip:{backgroundColor:"#14532d",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
         callbacks:{
           title:ctx=>ctx[0].raw.name,
           label:ctx=>{const d=ctx.raw;const sign=d.diff>=0?"+":"";return[` Actual: ${d.act.toFixed(3)}`,` Predicted: ${d.pred.toFixed(3)}`,` Diff: ${sign}${d.diff.toFixed(1)}%`]}
@@ -1024,7 +1024,7 @@ new Chart(document.getElementById("growingPueChart"),{
     indexAxis:"y",
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+      tooltip:{backgroundColor:"#14532d",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
         callbacks:{title:ctx=>gSorted[ctx[0].dataIndex].name,label:ctx=>{const m=gSorted[ctx[0].dataIndex];return[` Predicted PUE: ${m.pue.toFixed(3)} (${TIER_LBL[m.tier]})`,` ±0.030 RMSE · Google-level ops assumed`]}}}
     },
     scales:{
@@ -1039,7 +1039,7 @@ new Chart(document.getElementById("growingPueChart"),{
 Chart.register({id:"pueRefs",afterDraw(chart){
   if(chart.canvas.id!=="growingPueChart")return;
   const ctx=chart.ctx;
-  [{v:1.09,lbl:"Fleet avg 1.09",col:"rgba(27,58,107,0.55)"},{v:1.093,lbl:"Hamina FI (best)",col:"rgba(10,124,82,0.65)"}]
+  [{v:1.09,lbl:"Fleet avg 1.09",col:"rgba(20,83,45,0.55)"},{v:1.093,lbl:"Hamina FI (best)",col:"rgba(10,124,82,0.65)"}]
   .forEach(({v,lbl,col},i)=>{
     const x=chart.scales.x.getPixelForValue(v); ctx.save();
     ctx.setLineDash([4,4]); ctx.strokeStyle=col; ctx.lineWidth=1.5;
@@ -1062,7 +1062,7 @@ new Chart(document.getElementById("bubbleGrowing"),{
   options:{
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+      tooltip:{backgroundColor:"#14532d",titleFont:{family:"JetBrains Mono",size:11},bodyFont:{family:"JetBrains Mono",size:11},padding:12,
         callbacks:{
           title:ctx=>ctx[0].raw.name,
           label:ctx=>{const d=ctx.raw;return[` Predicted PUE: ${d.pue.toFixed(3)}`,` CO₂: ${d.co2.toLocaleString()} tons/yr`,` Underpays ETS by $${d.gapM.toFixed(2)}M/yr`,` Cooling: $${d.coolM.toFixed(1)}M/yr`,` Carbon price: $${d.carbonP}/ton`]}
@@ -1108,7 +1108,7 @@ new Chart(document.getElementById("allGapChart"),{
     indexAxis:"y",
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:"#1b3a6b",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
+      tooltip:{backgroundColor:"#14532d",bodyFont:{family:"JetBrains Mono",size:11},padding:12,
         callbacks:{label:ctx=>{const v=ctx.raw;return v>=0?` Overpays ETS by $${v.toFixed(2)}M/yr`:` Underpays ETS by $${Math.abs(v).toFixed(2)}M/yr`}}}
     },
     scales:{
@@ -1122,9 +1122,9 @@ new Chart(document.getElementById("allGapChart"),{
 Chart.register({id:"zeroAll",afterDraw(chart){
   if(chart.canvas.id!=="allGapChart")return;
   const x0=chart.scales.x.getPixelForValue(0); const ctx=chart.ctx; ctx.save();
-  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(27,58,107,0.4)"; ctx.lineWidth=1.5;
+  ctx.setLineDash([5,4]); ctx.strokeStyle="rgba(20,83,45,0.4)"; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(x0,chart.chartArea.top); ctx.lineTo(x0,chart.chartArea.bottom); ctx.stroke();
-  ctx.setLineDash([]); ctx.fillStyle="rgba(27,58,107,0.55)"; ctx.font="9px JetBrains Mono";
+  ctx.setLineDash([]); ctx.fillStyle="rgba(20,83,45,0.55)"; ctx.font="9px JetBrains Mono";
   ctx.fillText("ETS breakeven",x0+4,chart.chartArea.top+14); ctx.restore();
 }});
 
